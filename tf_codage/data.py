@@ -7,18 +7,70 @@ def load_into_dataframe(csv_path):
     """Load and preprocess CSV file"""
 
     df = pd.read_csv(csv_path, escapechar='\\', header=None)
-    df.columns = ['encounter_num', 'acte', 'texte', 'instance_num']
+    if len(df.columns) == 4:
+        column_names = ['encounter_num', 'acte', 'texte', 'instance_num']
+    elif len(df.columns) == 5:
+        column_names = ['encounter_num', 'acte', 'texte', 'instance_num', 'libelle']
+        
+    df.columns = column_names
 
     # shuffle the data frame
     df = df.sample(frac=1, random_state=13341).reset_index(drop=True)
+    return df
 
+def dataframe_to_multilabeL(df):
+    """Add multilabel target to data frame"""
+    
     # transform into multi-labels
     gb = df.groupby(['encounter_num', 'texte'])
     df_new = gb['acte'].apply(set)
     df_new.name = 'target'
-    df_encoded = df_new.reset_index()
+    df_encoded = df_new.reset_index(drop=True)
     
     return df_encoded
+
+def dataframe_to_paired_sentences(df, fraction_data=1.):
+    """Add columns for paired sentences task"""
+    
+    df = df[~df.libelle.isnull()]
+
+    # keep only top codes
+    top_acte = df.acte.value_counts().index[:10]
+    #df = df[df.acte.isin(top_acte)]
+
+    df = df.reset_index(drop=True)
+    df['target'] = 1 # for matching sentences
+    
+    # add shuffled definitions
+    shuffled_libelle = df.libelle.sample(frac=1, random_state=13341).reset_index().drop('index', axis=1)
+
+    df2 = df.copy()
+    df2.libelle = shuffled_libelle
+
+    df2['target'] = 0 # for not matching
+
+    df_union = pd.concat([df, df2], axis=0).reset_index(drop=True)
+
+    # randomly shuffle rows
+    df_union = df_union.sample(frac=fraction_data, random_state=93313).reset_index(drop=True)
+    
+    return df_union
+
+def make_multilabel_dataframe(csv_path):
+    """Make multilabel dataframe"""
+    
+    df = load_into_dataframe(csv_path)
+    df = dataframe_to_multilabel(df)
+    
+    return df
+
+def make_paired_sentences_dataframe(csv_path, fraction_data=1.):
+    """Make paired sentences dataframe"""
+    
+    df = load_into_dataframe(csv_path)
+    df = dataframe_to_paired_sentences(df, fraction_data=fraction_data)
+    
+    return df
 
 def make_tokenize(tokenizer, max_len=512):
     """Make tokenize function that uses the tokenizer object"""
