@@ -1,6 +1,7 @@
-from sklearn.preprocessing import  MultiLabelBinarizer
+from sklearn.preprocessing import  MultiLabelBinarizer, LabelBinarizer, OneHotEncoder
 import tensorflow as tf
 import pandas as pd
+import numpy as np
     
 def load_into_dataframe(csv_path):
     """Load and preprocess CSV file"""
@@ -23,7 +24,10 @@ def make_tokenize(tokenizer, max_len=512):
     """Make tokenize function that uses the tokenizer object"""
     def _tokenize(seq_1, seq_2=None):
         """Tokenize input sequeneces"""
-        inputs = tokenizer.encode_plus(seq_1, seq_2, add_special_tokens=True, max_length=max_len)
+        inputs = tokenizer.encode_plus(
+            seq_1, seq_2, 
+            add_special_tokens=True, max_length=max_len,
+            truncation_strategy='only_first')
         outputs = {}
         n_tokens = len(inputs['input_ids'])
         for k in ['input_ids', 'token_type_ids']:
@@ -32,11 +36,27 @@ def make_tokenize(tokenizer, max_len=512):
         return outputs
     return _tokenize
 
-
-def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, validation_split=0.1, phrase_2=None):
+class DummyEncoder:
+    
+    def transform(self, input):
+        return input
+    
+def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, validation_split=0.1, phrase_2=None, encoder='multilabel_binarizer'):
     """Create TF datasets (validation and training) from pandas series"""
     
-    target_encoder = MultiLabelBinarizer().fit(target)
+    if encoder == 'multilabel_binarizer':
+        target_encoder = MultiLabelBinarizer().fit(target)
+    else:
+        target_encoder = DummyEncoder()
+        
+    encoded_value = target_encoder.transform([target[0]])
+    ndim = np.asarray(encoded_value).ndim
+    
+    if ndim == 2:
+        shape = [None]
+    else:
+        shape = []
+        
     tf_dtypes = ({'input_ids': tf.int32,
               'attention_mask': tf.int32,
               'token_type_ids': tf.int32},
@@ -44,22 +64,23 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
     tf_shapes = ({'input_ids': tf.TensorShape([None]),
                   'attention_mask': tf.TensorShape([None]),
                   'token_type_ids': tf.TensorShape([None])},
-                 tf.TensorShape([None])
+                 tf.TensorShape(shape)
                 )
     
     def _dataset_gen(data_slice):
         """make generator for data generation from a subset of data"""
         phrase_1_set = phrase_1[data_slice]
-        if phrase_2:
+        
+        if phrase_2 is not None:
             phrase_2_set = phrase_2[data_slice]
         target_set = target[data_slice]
         
         def _generator():
-            if not phrase_2:
+            if phrase_2 is None:
                 tokens = (tokenize(r) for r in phrase_1_set)
             else:
                 tokens = (tokenize(r_1, r_2) 
-                          for r1, r2 in zip(phrase_1_set, phrase_2_set))
+                          for r_1, r_2 in zip(phrase_1_set, phrase_2_set))
             return zip(tokens, 
                        target_encoder.transform(target_set.to_list()))
         return _generator
@@ -77,4 +98,4 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
     train_set = train_set.cache().batch(batch_size)
     validation_set = validation_set.cache().batch(batch_size)
 
-    return train_set, validation_set
+    return train_set, validation_set, target_encoder
