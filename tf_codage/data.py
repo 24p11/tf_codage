@@ -18,14 +18,14 @@ def load_into_dataframe(csv_path):
     df = df.sample(frac=1, random_state=13341).reset_index(drop=True)
     return df
 
-def dataframe_to_multilabeL(df):
+def dataframe_to_multilabel(df):
     """Add multilabel target to data frame"""
     
     # transform into multi-labels
     gb = df.groupby(['encounter_num', 'texte'])
     df_new = gb['acte'].apply(set)
     df_new.name = 'target'
-    df_encoded = df_new.reset_index(drop=True)
+    df_encoded = df_new.reset_index()
     
     return df_encoded
 
@@ -60,17 +60,19 @@ def make_multilabel_dataframe(csv_path):
     """Make multilabel dataframe"""
     
     df = load_into_dataframe(csv_path)
+    num_labels = int(df.acte.value_counts().count())
     df = dataframe_to_multilabel(df)
     
-    return df
+    return df, num_labels
 
 def make_paired_sentences_dataframe(csv_path, fraction_data=1.):
     """Make paired sentences dataframe"""
     
     df = load_into_dataframe(csv_path)
     df = dataframe_to_paired_sentences(df, fraction_data=fraction_data)
+    num_labels = int(df.target.value_counts().count())
     
-    return df
+    return df, num_labels
 
 def make_tokenize(tokenizer, max_len=512):
     """Make tokenize function that uses the tokenizer object"""
