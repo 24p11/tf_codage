@@ -56,10 +56,22 @@ def dataframe_to_paired_sentences(df, fraction_data=1.):
     
     return df_union
 
-def make_multilabel_dataframe(csv_path):
+def aggregate_classes(df, column='acte', other_name='OTHER', min_examples=30):
+    """Combine infrequent classes into a common class"""
+    
+    column = 'acte'
+    examples_per_label = df[column].value_counts()
+    small_labels = examples_per_label[examples_per_label < min_examples].index.to_numpy()
+
+    df.loc[df[column].isin(small_labels), column] = 'OTHER'
+    
+    return df
+    
+def make_multilabel_dataframe(csv_path, min_examples=30):
     """Make multilabel dataframe"""
     
     df = load_into_dataframe(csv_path)
+    df = aggregate_classes(df, min_examples=min_examples)
     num_labels = int(df.acte.value_counts().count())
     df = dataframe_to_multilabel(df)
     
