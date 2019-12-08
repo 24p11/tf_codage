@@ -62,6 +62,7 @@ def aggregate_classes(df, column='acte', other_name='OTHER', min_examples=30):
     column = 'acte'
     examples_per_label = df[column].value_counts()
     small_labels = examples_per_label[examples_per_label < min_examples].index.to_numpy()
+    df = df.copy()
 
     df.loc[df[column].isin(small_labels), column] = 'OTHER'
     
