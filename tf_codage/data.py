@@ -113,6 +113,8 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
     
     if encoder == 'multilabel_binarizer':
         target_encoder = MultiLabelBinarizer().fit(target)
+    elif encoder == 'label_binarizer':
+        target_encoder = LabelBinarizer().fit(target)
     else:
         target_encoder = DummyEncoder()
         
