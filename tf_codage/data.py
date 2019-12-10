@@ -3,10 +3,10 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
     
-def load_into_dataframe(csv_path):
+def load_into_dataframe(csv_path, **kwargs):
     """Load and preprocess CSV file"""
 
-    df = pd.read_csv(csv_path, escapechar='\\', header=None)
+    df = pd.read_csv(csv_path, escapechar='\\', header=None, **kwargs)
     if len(df.columns) == 4:
         column_names = ['encounter_num', 'acte', 'texte', 'instance_num']
     elif len(df.columns) == 5:
