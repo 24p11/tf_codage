@@ -22,7 +22,7 @@ class FullTextBert(TFCamembertModel):
         self.sep_token = sep_token
         self.max_batches = max_batches
     
-    def call(self, input_ids, **kwargs):
+    def call(self, inputs, **kwargs):
         cls_token = self.cls_token
         sep_token = self.sep_token
         
@@ -32,8 +32,16 @@ class FullTextBert(TFCamembertModel):
         
         # take account of special tokens
         bert_seq_len = input_size - 2
-        n_seq, seq_len = input_ids.shape
         
+        if isinstance(inputs, dict):
+            input_ids = inputs['input_ids']
+            attention_mask = inputs.get('attention_mask', None)
+        else:
+            input_ids = inputs
+            attention_mask = None
+        
+        
+        n_seq, seq_len = input_ids.shape
         padded_inputs = tf.pad(input_ids, [[0, 0], [0, max_batches * bert_seq_len - seq_len]], constant_values=1)
         
         new_tensor = tf.reshape(padded_inputs, [-1, bert_seq_len])
@@ -41,9 +49,23 @@ class FullTextBert(TFCamembertModel):
         padded_tensor = tf.pad(new_tensor, [[0, 0], [1,0]], constant_values=cls_token)
         padded_tensor = tf.pad(padded_tensor, [[0, 0], [0,1]], constant_values=sep_token)
         
-        outputs = self.roberta(padded_tensor, **kwargs)
+        if attention_mask is not None:
+            padded_mask = tf.pad(attention_mask, [[0, 0], [0, max_batches * bert_seq_len - seq_len]], constant_values=0)
+            attention_mask = tf.reshape(padded_mask, [-1, bert_seq_len])
+            attention_mask = tf.pad(attention_mask, [[0, 0], [1, 1]], constant_values=1)
+            
+        
+        outputs = self.roberta(padded_tensor,
+                               attention_mask=attention_mask,
+                               **kwargs)
         
         reshaped_outputs = tf.reshape(outputs[0], [-1, max_batches, input_size, hidden_size])
+        
+        if attention_mask is not None:
+            reshaped_mask = tf.reshape(attention_mask, [-1, max_batches, input_size])
+        else:
+            reshaped_mask = None
+            
         return reshaped_outputs
 
 class BertForMultilabelClassification(TFBertForSequenceClassification):

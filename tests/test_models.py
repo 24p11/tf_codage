@@ -32,9 +32,6 @@ Lyon, historiquement ville industrielle, a accueilli au sud de la ville de nombr
 Par sa population, Lyon constitue la troisième commune de France, avec 516 092 habitants au dernier recensement de 2017. Lyon est ville-centre de la 2e unité urbaine de France, laquelle comptait 1 659 001 habitants en 2017 et de la 2e aire urbaine (2 326 223 habitants en 2017) de France. Elle est la préfecture de la région Auvergne-Rhône-Alpes et le siège de la métropole de Lyon, qui rassemble 59 communes et 1 385 927 habitants6 en 2017. La ville de Lyon exerce une attractivité d'importance nationale et européenne. Son importance dans les domaines culturels, bancaires, financiers, commerciaux, technologiques, pharmaceutiques, ou encore les arts et les divertissements font de la ville de Lyon une ville mondiale de rang « Beta- » selon le classement GaWC en 2016, comparable à Seattle, Amman ou Anvers7. Lyon est également le siège d'Interpol depuis 1989. 
 """]
 
-def test_dummy():
-    assert False
-    
 def test_full_text_bert():
     
     config = CamembertConfig(max_position_embeddings=514)
@@ -48,6 +45,48 @@ def test_full_text_bert():
     
     outputs = model(input_ids)
     assert outputs.shape == (3, 10, 512, 768)
+    
+    # test with dict input
+    outputs_dict = model({'input_ids': input_ids})
+    assert outputs_dict.shape == (3, 10, 512, 768)
+    assert (outputs_dict.numpy() == outputs.numpy()).all()
+    
+    # test with attention mask
+    outputs_attention = model({'input_ids': input_ids,
+                              'attention_mask': tf.ones((3, 5), tf.int32)})
+    assert outputs.shape == (3, 10, 512, 768)
+    # because of the padding
+    assert not (outputs_attention.numpy() == outputs.numpy()).all()
+    
+def test_full_text_bert_attention_mask():
+    
+    config = CamembertConfig(max_position_embeddings=514)
+    model = FullTextBert(config, cls_token=5, sep_token=6)
+    
+    input1 = tf.constant([[3, 4, 8, 7]])
+    attention_mask1 = tf.constant([[1, 1, 1, 1]])
+    input2 = tf.constant([[3, 4, 8, 7, 5]])
+    attention_mask2a = tf.constant([[1, 1, 1, 1, 1]])
+    attention_mask2b = tf.constant([[1, 1, 1, 1, 0]])
+    
+    
+    out1 = model({'input_ids': input1,
+                  'attention_mask': attention_mask1})
+    out2a = model({'input_ids': input2,
+                  'attention_mask': attention_mask2a})
+    out2b = model({'input_ids': input2,
+                  'attention_mask': attention_mask2b})
+    
+    
+    # first 4 tokens should not be influenced by the last one if the mask set
+    assert (out1.numpy()[0, 0, :5, :] == out2b.numpy()[0, 0, :5, :]).all()
+    
+    # last token should differ 
+    assert not (out1.numpy()[0, 0, 5, :] == out2b.numpy()[0, 0, 5, :]).all()
+    
+    # if the mask is not set, the last token my influence the rest
+    assert not (out1.numpy()[0, 0, :5, :] == out2a.numpy()[0, 0, :5, :]).all()
+
 
 def test_full_text_bert_compare():
     """Compare full text bert with batches of standard camembert"""
