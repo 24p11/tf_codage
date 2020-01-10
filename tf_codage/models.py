@@ -28,6 +28,7 @@ class FullTextBert(TFCamembertModel):
         
         max_batches = self.max_batches
         input_size = 512
+        hidden_size = self.config.hidden_size
         
         # take account of special tokens
         bert_seq_len = input_size - 2
@@ -35,14 +36,14 @@ class FullTextBert(TFCamembertModel):
         
         padded_inputs = tf.pad(input_ids, [[0, 0], [0, max_batches * bert_seq_len - seq_len]], constant_values=1)
         
-        new_tensor = tf.reshape(padded_inputs, [n_seq * max_batches, bert_seq_len])
+        new_tensor = tf.reshape(padded_inputs, [-1, bert_seq_len])
         
         padded_tensor = tf.pad(new_tensor, [[0, 0], [1,0]], constant_values=cls_token)
         padded_tensor = tf.pad(padded_tensor, [[0, 0], [0,1]], constant_values=sep_token)
         
         outputs = self.roberta(padded_tensor, **kwargs)
         
-        reshaped_outputs = tf.reshape(outputs[0], [n_seq, max_batches, input_size, -1])
+        reshaped_outputs = tf.reshape(outputs[0], [-1, max_batches, input_size, hidden_size])
         return reshaped_outputs
 
 class BertForMultilabelClassification(TFBertForSequenceClassification):
