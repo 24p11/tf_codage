@@ -43,16 +43,17 @@ def test_full_text_bert():
      [7, 2, 1, 1, 1],
      [0, 1, 0, 3, 3]])
     
-    outputs = model(input_ids)
+    outputs, mask = model(input_ids)
     assert outputs.shape == (3, 10, 512, 768)
+    assert mask is None
     
     # test with dict input
-    outputs_dict = model({'input_ids': input_ids})
+    outputs_dict, _ = model({'input_ids': input_ids})
     assert outputs_dict.shape == (3, 10, 512, 768)
     assert (outputs_dict.numpy() == outputs.numpy()).all()
     
     # test with attention mask
-    outputs_attention = model({'input_ids': input_ids,
+    outputs_attention, _ = model({'input_ids': input_ids,
                               'attention_mask': tf.ones((3, 5), tf.int32)})
     assert outputs.shape == (3, 10, 512, 768)
     # because of the padding
@@ -70,11 +71,11 @@ def test_full_text_bert_attention_mask():
     attention_mask2b = tf.constant([[1, 1, 1, 1, 0]])
     
     
-    out1 = model({'input_ids': input1,
+    out1, mask1 = model({'input_ids': input1,
                   'attention_mask': attention_mask1})
-    out2a = model({'input_ids': input2,
+    out2a, mask2a = model({'input_ids': input2,
                   'attention_mask': attention_mask2a})
-    out2b = model({'input_ids': input2,
+    out2b, mask2b = model({'input_ids': input2,
                   'attention_mask': attention_mask2b})
     
     
@@ -86,6 +87,18 @@ def test_full_text_bert_attention_mask():
     
     # if the mask is not set, the last token my influence the rest
     assert not (out1.numpy()[0, 0, :5, :] == out2a.numpy()[0, 0, :5, :]).all()
+    
+    # test masks
+    expected_mask = np.zeros((10, 512))
+    expected_mask[0, 1:5] = 1
+    # special tokens are not masked
+    expected_mask[:, 0] = 1
+    expected_mask[:, -1] = 1
+    assert (mask1.numpy() == expected_mask).all()
+    assert (mask2b.numpy() == expected_mask).all()
+    
+    expected_mask[0, 5] = 1
+    assert (mask2a.numpy() == expected_mask).all()
 
 
 def test_full_text_bert_compare():
@@ -116,7 +129,7 @@ def test_full_text_bert_compare():
     
     out_bert = np.array([single_model(np.array(b))[0].numpy() for b in bert_inputs])
     
-    out_full_bert = fulltext_model(np.array(multi_token))
+    out_full_bert, _ = fulltext_model(np.array(multi_token))
     
     assert_allclose(out_bert, out_full_bert.numpy(), atol=1e-4)
     

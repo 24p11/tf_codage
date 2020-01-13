@@ -66,7 +66,7 @@ class FullTextBert(TFCamembertModel):
         else:
             reshaped_mask = None
             
-        return reshaped_outputs
+        return reshaped_outputs, reshaped_mask
 
 class BertForMultilabelClassification(TFBertForSequenceClassification):
     """Bert for sequence classification with sigmoid activation in the output layer"""
