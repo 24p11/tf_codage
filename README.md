@@ -38,5 +38,6 @@ schedule training all models on the workers
 ### Evaluating models
 
 
-## Classification of hospital discharge ("Conpter rendu hospitalization", CRH)
+## Classification of hospital discharge ("Compte rendu hospitalization", CRH)
 
+# Web service
