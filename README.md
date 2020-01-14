@@ -9,6 +9,11 @@ Then install `tf_codage` and `load_balancer`:
 
 TODO: create package for load_balancer.
 
+## Running unit tests
+
+The library `tf_codage` comes with a few unit tests. To run them use:
+
+`pytest tests`
 
 # Models
 
