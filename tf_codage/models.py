@@ -1,9 +1,15 @@
+import os
+import GPUtil
 from transformers import TFBertForSequenceClassification, BertConfig
 from transformers import CamembertTokenizer
 from transformers import TFRobertaForSequenceClassification
 from transformers import TFRobertaModel
 from transformers import CamembertConfig
 import tensorflow as tf
+
+os.environ['CUDA_DEVICE_ORDER'] = os.environ.get('CUDA_DEVICE_ORDER', 'PCI_BUS_ID')
+available_devices = str(GPUtil.getFirstAvailable(maxMemory=0.1)[0])
+os.environ['CUDA_VISIBLE_DEVICES'] = os.environ.get('CUDA_VISIBLE_DEVICES', available_devices)
 
 class TFCamembertForSequenceClassification(TFRobertaForSequenceClassification):
     config_class = CamembertConfig
