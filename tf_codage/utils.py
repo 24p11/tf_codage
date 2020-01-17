@@ -36,3 +36,39 @@ def download_hdfs(input_file, output_file):
         fid = conn.open(f)
         output_file.write(fid.read())
     output_file.close()
+    
+def save_model(model, model_name, metric_data=None, tokenizer=None, encoder=None, root_dir='..'):
+    """Save model to subdirs of `root_dir` together with the metrics, encoder and tokenzier if specified."""
+
+    import os
+
+    model_dir = os.path.join(root_dir, 'models', model_name)
+    print('Saving model to ', model_dir)
+
+    os.makedirs(model_dir, exist_ok=True)
+
+    model.save_pretrained(model_dir)
+
+    if metric_data:
+        
+        metrics_dir = os.path.join(root_dir, 'metrics') 
+        os.makedirs(metrics_dir, exist_ok=True)
+        
+
+        metric_dict = dict(zip(model.metrics_names,
+                 map(float, metric_data)))
+
+        import json
+        with open(
+            os.path.join(
+                metrics_dir,
+                model_name + '.json'), 'w') as fid:
+            json.dump(metric_dict, fid)
+
+
+    if tokenizer:
+        tokenizer.save_pretrained(model_dir)
+
+    if encoder:
+        import joblib
+        joblib.dump(encoder, os.path.join(model_dir, 'encoder.joblib'))
