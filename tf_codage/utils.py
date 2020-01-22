@@ -1,3 +1,6 @@
+import sys
+from contextlib import redirect_stdout
+
 class TeeStream:
     """Redirect stream to many different outputs.
     
@@ -16,8 +19,14 @@ class TeeStream:
         for s in self._streams:
             s.flush()
             
+def notebook_copy_stdout():
+    """Context manager to copy the notebook output to standard output (terminal)"""
+    tee = TeeStream(sys.stdout, sys.__stdout__)
+    redirect = redirect_stdout(tee)
+    return redirect
 
 def download_hdfs(input_file, output_file):
+    """Download files from HDFS store."""
     import sys
     import pyarrow
     conn = pyarrow.hdfs.connect()
@@ -72,3 +81,4 @@ def save_model(model, model_name, metric_data=None, tokenizer=None, encoder=None
     if encoder:
         import joblib
         joblib.dump(encoder, os.path.join(model_dir, 'encoder.joblib'))
+    
