@@ -69,10 +69,15 @@ def aggregate_classes(df, column='acte', other_name='OTHER', min_examples=30):
     
     return df
     
-def make_multilabel_dataframe(csv_path, min_examples=30):
-    """Make multilabel dataframe"""
+def make_multilabel_dataframe(csv_path, min_examples=30, use_classes=None):
+    """Make multilabel dataframe.
+    
+    use_classes: which classes to return, the classes which are not in the
+    list will be replace with 'OTHER'"""
     
     df = load_into_dataframe(csv_path, shuffle=False)
+    if use_classes is not None:
+        df.loc[~df.acte.isin(use_classes), 'acte'] = 'OTHER'
     df = aggregate_classes(df, min_examples=min_examples)
     num_labels = int(df.acte.value_counts().count())
     df = dataframe_to_multilabel(df)
@@ -117,6 +122,8 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
         target_encoder = MultiLabelBinarizer().fit(target)
     elif encoder == 'label_binarizer':
         target_encoder = LabelBinarizer().fit(target)
+    elif hasattr(encoder, 'transform'):
+        target_encoder = encoder
     else:
         target_encoder = DummyEncoder()
         
