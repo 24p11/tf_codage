@@ -3,7 +3,7 @@ import tensorflow as tf
 import pandas as pd
 import numpy as np
     
-def load_into_dataframe(csv_path, **kwargs):
+def load_into_dataframe(csv_path, shuffle=True, **kwargs):
     """Load and preprocess CSV file"""
 
     df = pd.read_csv(csv_path, escapechar='\\', header=None, **kwargs)
@@ -15,7 +15,8 @@ def load_into_dataframe(csv_path, **kwargs):
     df.columns = column_names
 
     # shuffle the data frame
-    df = df.sample(frac=1, random_state=13341).reset_index(drop=True)
+    if shuffle:
+        df = df.sample(frac=1, random_state=13341).reset_index(drop=True)
     return df
 
 def dataframe_to_multilabel(df):
@@ -71,10 +72,11 @@ def aggregate_classes(df, column='acte', other_name='OTHER', min_examples=30):
 def make_multilabel_dataframe(csv_path, min_examples=30):
     """Make multilabel dataframe"""
     
-    df = load_into_dataframe(csv_path)
+    df = load_into_dataframe(csv_path, shuffle=False)
     df = aggregate_classes(df, min_examples=min_examples)
     num_labels = int(df.acte.value_counts().count())
     df = dataframe_to_multilabel(df)
+    df = df.sample(frac=1, random_state=13341).reset_index(drop=True)
     
     return df, num_labels
 
