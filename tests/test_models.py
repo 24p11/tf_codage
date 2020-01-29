@@ -4,6 +4,7 @@ from transformers import CamembertTokenizer
 import tensorflow as tf
 import numpy as np
 from numpy.testing import assert_allclose
+from tempfile import mkdtemp
 
 wiki_text = ["""
 Paris [pa.ʁi]a Écouter est la ville la plus peuplée et la capitale de la France.
@@ -104,10 +105,11 @@ def test_full_text_bert_attention_mask():
 def test_full_text_bert_compare():
     """Compare full text bert with batches of standard camembert"""
     
-    model_dir = 'models/camembert-lm-finetuned'
+    model_dir = mkdtemp()
      
+    tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
+    config = CamembertConfig.from_pretrained("camembert-base")
 
-    tokenizer = CamembertTokenizer.from_pretrained(model_dir)
     cls_token = tokenizer.cls_token_id
     sep_token = tokenizer.sep_token_id
     max_batches = 2
@@ -123,13 +125,14 @@ def test_full_text_bert_compare():
     
     bert_inputs = [split_tokens(tok_ids) for tok_ids in multi_token] 
     
-    single_model = TFCamembertModel.from_pretrained(model_dir)
+    single_model = TFCamembertModel(config)
+    out_bert = np.array([single_model(np.array(b))[0].numpy() for b in bert_inputs])
+
+    single_model.save_pretrained(model_dir)
     fulltext_model = FullTextBert.from_pretrained(
         model_dir, cls_token=cls_token, sep_token=sep_token, max_batches=max_batches) 
     
-    out_bert = np.array([single_model(np.array(b))[0].numpy() for b in bert_inputs])
     
     out_full_bert, _ = fulltext_model(np.array(multi_token))
     
     assert_allclose(out_bert, out_full_bert.numpy(), atol=1e-4)
-    
