@@ -1,4 +1,4 @@
-Set of utils and models for automating tagging of medical records (CRO and CRH).
+Set of utils and models for automating tagging of medical records ("compte rendu operatoire", CRO and "compte rendu hospitalisation", CRH).
 
 # Installation
 
