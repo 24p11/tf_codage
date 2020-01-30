@@ -33,6 +33,20 @@ Lyon, historiquement ville industrielle, a accueilli au sud de la ville de nombr
 Par sa population, Lyon constitue la troisième commune de France, avec 516 092 habitants au dernier recensement de 2017. Lyon est ville-centre de la 2e unité urbaine de France, laquelle comptait 1 659 001 habitants en 2017 et de la 2e aire urbaine (2 326 223 habitants en 2017) de France. Elle est la préfecture de la région Auvergne-Rhône-Alpes et le siège de la métropole de Lyon, qui rassemble 59 communes et 1 385 927 habitants6 en 2017. La ville de Lyon exerce une attractivité d'importance nationale et européenne. Son importance dans les domaines culturels, bancaires, financiers, commerciaux, technologiques, pharmaceutiques, ou encore les arts et les divertissements font de la ville de Lyon une ville mondiale de rang « Beta- » selon le classement GaWC en 2016, comparable à Seattle, Amman ou Anvers7. Lyon est également le siège d'Interpol depuis 1989. 
 """]
 
+def test_full_text_bert_layer_id():
+    """test selection of layer for classfication"""
+    config = CamembertConfig(max_position_embeddings=514)
+    model = FullTextBert(config, cls_token=5, sep_token=6, layer_id=-2)
+    
+    input_ids = tf.constant(
+    [[3, 1, 0, 5, 6],
+     [7, 2, 1, 1, 1],
+     [0, 1, 0, 3, 3]])
+    
+    outputs, mask = model(input_ids)
+    assert outputs.shape == (3, 10, 512, 768)
+    assert mask is None
+    
 def test_full_text_bert():
     
     config = CamembertConfig(max_position_embeddings=514)

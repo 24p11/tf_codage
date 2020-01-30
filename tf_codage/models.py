@@ -24,7 +24,17 @@ class TFCamembertModel(TFRobertaModel):
     
 class FullTextBert(TFCamembertModel):
     
-    def __init__(self, config, *inputs, cls_token=None, sep_token=None, max_batches=10, **kwargs):
+    def __init__(self, config, *inputs, cls_token=None, sep_token=None, max_batches=10, layer_id=-1, **kwargs):
+        """
+        
+        layer_id: which layer to use in the output, layer_id=0 is the first layer,
+          layer_id=-1 (the default) is the last layer
+        """
+        
+        if layer_id != -1:
+            config.output_hidden_states = True
+        
+        self.layer_id = layer_id
         
         super().__init__(config, *inputs, **kwargs)
         self.cls_token = cls_token
@@ -68,7 +78,12 @@ class FullTextBert(TFCamembertModel):
                                attention_mask=attention_mask,
                                **kwargs)
         
-        reshaped_outputs = tf.reshape(outputs[0], [-1, max_batches, input_size, hidden_size])
+        if self.layer_id == -1:
+            sequence_output = outputs[0]
+        else:
+            sequence_output = outputs[2][self.layer_id]
+        
+        reshaped_outputs = tf.reshape(sequence_output, [-1, max_batches, input_size, hidden_size])
         
         if attention_mask is not None:
             reshaped_mask = tf.reshape(attention_mask, [-1, max_batches, input_size])
