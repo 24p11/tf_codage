@@ -1,4 +1,5 @@
 from tf_codage.models import FullTextBert, TFCamembertModel
+from tf_codage import models
 from transformers import CamembertConfig
 from transformers import CamembertTokenizer
 import tensorflow as tf
@@ -150,3 +151,46 @@ def test_full_text_bert_compare():
     out_full_bert, _ = fulltext_model(np.array(multi_token))
     
     assert_allclose(out_bert, out_full_bert.numpy(), atol=1e-4)
+
+
+def test_mean_masked_pooling_layer():
+    """Test MeanMaskPoolingLayer"""
+    
+    n_batch = 4
+    n_tokens = 16
+    n_splits = 2
+    n_hidden = 2
+    hidden_inputs = np.random.randn(n_batch, n_tokens, n_splits, n_hidden).astype(np.float32)
+    mask = np.ones((n_batch, n_tokens, n_splits))
+    
+    config = models.FullTextConfig(pool_size=32, pool_strides=1)
+    pooling = models.MeanMaskedPooling(config)
+    
+    output = pooling(hidden_inputs, mask).numpy()
+    expected = hidden_inputs.reshape(n_batch, n_tokens * n_splits, 1, n_hidden).mean(1)
+    assert_allclose(expected, output)
+    
+    # test with different mask
+    mask[:, 8:, :] = 0
+    output = pooling(hidden_inputs, mask).numpy()
+    expected = hidden_inputs[:, :8, :, :].reshape(n_batch, 8 * n_splits, 1, n_hidden).mean(1)
+    assert_allclose(expected, output)
+    
+    # test non-overlapping strides
+    config = models.FullTextConfig(pool_size=8, pool_strides=8)
+    pooling = models.MeanMaskedPooling(config)
+    mask = np.ones((n_batch, n_tokens, n_splits))
+    
+    output = pooling(hidden_inputs, mask).numpy()
+    
+    assert output.shape == (n_batch, 4, n_hidden)
+    expected = hidden_inputs.reshape(n_batch, n_tokens * n_splits // 8, 8, n_hidden).mean(2)
+    assert_allclose(expected, output)
+    
+    # test shape with overlapping strides
+    config = models.FullTextConfig(pool_size=8, pool_strides=4)
+    pooling = models.MeanMaskedPooling(config)
+    
+    output = pooling(hidden_inputs, mask).numpy()
+    
+    assert output.shape == (n_batch, 7, n_hidden)
