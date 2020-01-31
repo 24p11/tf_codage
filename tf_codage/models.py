@@ -113,6 +113,7 @@ class CamembertForMultilabelClassification(TFCamembertForSequenceClassification)
     
 
 class MeanMaskedPooling(tf.keras.layers.Layer):
+    """Mean pooling with strides and mask"""
     
     def __init__(self, config, *args, **kwargs):
         pool_size = config.pool_size
@@ -134,22 +135,52 @@ class MeanMaskedPooling(tf.keras.layers.Layer):
                     2),
                 tf.float32)
             flattened_inputs = flattened_inputs * flattened_mask
-        #tf.reduce_max(flattend_inputs, axis=2)
+            
         x = self.pooling(flattened_inputs)
         if mask is not None:
             pooled_mask = self.pooling(flattened_mask)
             x = tf.divide(x, pooled_mask + 1e-9)
         return x
         
+class MaxMaskedPooling(tf.keras.layers.Layer):
+    """Max pooling with strides and mask"""
+    
         
+    def __init__(self, config, *args, **kwargs):
+        pool_size = config.pool_size
+        strides = config.pool_strides
+        num_labels = config.num_labels
+        
+        super().__init__(*args, **kwargs)
+        self.pooling = tf.keras.layers.MaxPooling1D(pool_size, strides)
+        
+    def call(self, inputs, mask=None):
+        n_batches, n_splits, n_tokens, hidden_size = inputs.shape
+        new_shape = [-1, n_splits * n_tokens, hidden_size]
+        flattened_inputs = tf.reshape(inputs, new_shape)
+        if mask is not None:
+            flattened_mask = (tf.cast(
+                tf.expand_dims(
+                    tf.reshape(mask, (-1, n_splits * n_tokens)),
+                    2),
+                tf.float32) - 1) * 1e30
+            flattened_inputs = flattened_inputs + flattened_mask
+            
+        x = self.pooling(flattened_inputs)
+        
+        return x
     
 class PoolingClassificationHead(tf.keras.layers.Layer):
     def __init__(self, config, *args, **kwargs):
         dropout_rate = config.hidden_dropout_prob
         hidden_size = config.classification_hidden_size
         num_labels = config.num_labels
+        pool_type = config.pool_type
         super().__init__(*args, **kwargs)
-        self.pooling = MeanMaskedPooling(config)
+        if pool_type == 'mean':
+            self.pooling = MeanMaskedPooling(config)
+        elif pool_type == 'max':
+            self.pooling = MaxMaskedPooling(config)
         self.flatten = tf.keras.layers.Flatten()
         self.norm1 = tf.keras.layers.BatchNormalization()
         self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
@@ -174,9 +205,10 @@ class FullTextConfig(CamembertConfig):
     
     model_type = 'camembert'
     
-    def __init__(self, pool_size=512, pool_strides=128, classification_hidden_size=50, **kwargs):
+    def __init__(self, pool_size=512, pool_strides=128, classification_hidden_size=50, pool_type='mean', **kwargs):
         super().__init__(**kwargs)
         self.pool_size = pool_size
         self.pool_strides = pool_strides
         self.classification_hidden_size = classification_hidden_size
+        self.pool_type = pool_type
         

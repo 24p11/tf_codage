@@ -194,3 +194,26 @@ def test_mean_masked_pooling_layer():
     output = pooling(hidden_inputs, mask).numpy()
     
     assert output.shape == (n_batch, 7, n_hidden)
+    
+def test_max_masked_pooling_layer():
+    """Test MaxMaskPoolingLayer"""
+    
+    n_batch = 4
+    n_tokens = 16
+    n_splits = 2
+    n_hidden = 2
+    hidden_inputs = np.random.randn(n_batch, n_tokens, n_splits, n_hidden).astype(np.float32)
+    mask = np.ones((n_batch, n_tokens, n_splits))
+    
+    config = models.FullTextConfig(pool_size=32, pool_strides=1)
+    pooling = models.MaxMaskedPooling(config)
+    
+    output = pooling(hidden_inputs, mask).numpy()
+    expected = hidden_inputs.reshape(n_batch, n_tokens * n_splits, 1, n_hidden).max(1)
+    assert_allclose(expected, output)
+    
+    # test with different mask
+    mask[:, 8:, :] = 0
+    output = pooling(hidden_inputs, mask).numpy()
+    expected = hidden_inputs[:, :8, :, :].reshape(n_batch, 8 * n_splits, 1, n_hidden).max(1)
+    assert_allclose(expected, output)
