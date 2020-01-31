@@ -144,9 +144,10 @@ class MeanMaskedPooling(tf.keras.layers.Layer):
         
     
 class PoolingClassificationHead(tf.keras.layers.Layer):
-    def __init__(self, config, pool_size, strides, num_labels, hidden_size=50, *args, **kwargs):
+    def __init__(self, config, *args, **kwargs):
         dropout_rate = config.hidden_dropout_prob
-        classification_hidden_size = config.classification_hidden_size
+        hidden_size = config.classification_hidden_size
+        num_labels = config.num_labels
         super().__init__(*args, **kwargs)
         self.pooling = MeanMaskedPooling(config)
         self.flatten = tf.keras.layers.Flatten()
