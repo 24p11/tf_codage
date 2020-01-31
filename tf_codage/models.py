@@ -109,3 +109,73 @@ class CamembertForMultilabelClassification(TFCamembertForSequenceClassification)
         activation = tf.keras.layers.Activation('sigmoid')
         probs = activation(outputs[0])
         return probs
+    
+    
+
+class MeanMaskedPooling(tf.keras.layers.Layer):
+    
+    def __init__(self, config, *args, **kwargs):
+        pool_size = config.pool_size
+        strides = config.pool_strides
+        num_labels = config.num_labels
+        
+        super().__init__(*args, **kwargs)
+        self.pooling = tf.keras.layers.AveragePooling1D(pool_size, strides)
+        
+    def call(self, inputs, mask=None):
+        
+        n_batches, n_splits, n_tokens, hidden_size = inputs.shape
+        new_shape = [-1, n_splits * n_tokens, hidden_size]
+        flattened_inputs = tf.reshape(inputs, new_shape)
+        if mask is not None:
+            flattened_mask = tf.cast(
+                tf.expand_dims(
+                    tf.reshape(mask, (-1, n_splits * n_tokens)),
+                    2),
+                tf.float32)
+            flattened_inputs = flattened_inputs * flattened_mask
+        #tf.reduce_max(flattend_inputs, axis=2)
+        x = self.pooling(flattened_inputs)
+        if mask is not None:
+            pooled_mask = self.pooling(flattened_mask)
+            x = tf.divide(x, pooled_mask + 1e-9)
+        return x
+        
+        
+    
+class PoolingClassificationHead(tf.keras.layers.Layer):
+    def __init__(self, config, pool_size, strides, num_labels, hidden_size=50, *args, **kwargs):
+        dropout_rate = config.hidden_dropout_prob
+        classification_hidden_size = config.classification_hidden_size
+        super().__init__(*args, **kwargs)
+        self.pooling = MeanMaskedPooling(config)
+        self.flatten = tf.keras.layers.Flatten()
+        self.norm1 = tf.keras.layers.BatchNormalization()
+        self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
+        self.dense1 = tf.keras.layers.Dense(hidden_size, activation='relu')
+        self.norm2 = tf.keras.layers.BatchNormalization()
+        self.dropout2 = tf.keras.layers.Dropout(dropout_rate)
+        self.dense2 = tf.keras.layers.Dense(num_labels, activation='softmax')
+        
+    
+    def call(self, inputs, mask):
+        x = self.pooling(inputs)
+        x = self.flatten(x)
+        x = self.norm1(x)
+        x = self.dropout1(x)
+        x = self.dense1(x)
+        x = self.norm2(x)
+        x = self.dropout2(x)
+        x = self.dense2(x)
+        return x
+    
+class FullTextConfig(CamembertConfig):
+    
+    model_type = 'camembert'
+    
+    def __init__(self, pool_size=512, pool_strides=128, classification_hidden_size=50, **kwargs):
+        super().__init__(**kwargs)
+        self.pool_size = pool_size
+        self.pool_strides = pool_strides
+        self.classification_hidden_size = classification_hidden_size
+        
