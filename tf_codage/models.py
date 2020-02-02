@@ -181,6 +181,8 @@ class PoolingClassificationHead(tf.keras.layers.Layer):
             self.pooling = MeanMaskedPooling(config)
         elif pool_type == 'max':
             self.pooling = MaxMaskedPooling(config)
+        elif issubclass(pool_type, tf.keras.layers.Layer):
+            self.pooling = pool_type(config)
         self.flatten = tf.keras.layers.Flatten()
         self.norm1 = tf.keras.layers.BatchNormalization()
         self.dropout1 = tf.keras.layers.Dropout(dropout_rate)
@@ -191,7 +193,7 @@ class PoolingClassificationHead(tf.keras.layers.Layer):
         
     
     def call(self, inputs, mask):
-        x = self.pooling(inputs)
+        x = self.pooling(inputs, mask)
         x = self.flatten(x)
         x = self.norm1(x)
         x = self.dropout1(x)
