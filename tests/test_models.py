@@ -96,25 +96,25 @@ def test_full_text_bert_attention_mask():
     
     
     # first 4 tokens should not be influenced by the last one if the mask set
-    assert (out1.numpy()[0, 0, :5, :] == out2b.numpy()[0, 0, :5, :]).all()
+    assert_allclose(out1.numpy()[0, 0, :5, :], out2b.numpy()[0, 0, :5, :])
     
     # last token should differ 
-    assert not (out1.numpy()[0, 0, 5, :] == out2b.numpy()[0, 0, 5, :]).all()
+    assert not np.allclose(out1.numpy()[0, 0, 5, :], out2b.numpy()[0, 0, 5, :])
     
     # if the mask is not set, the last token my influence the rest
-    assert not (out1.numpy()[0, 0, :5, :] == out2a.numpy()[0, 0, :5, :]).all()
+    assert not np.allclose(out1.numpy()[0, 0, :5, :], out2a.numpy()[0, 0, :5, :])
     
     # test masks
-    expected_mask = np.zeros((10, 512))
-    expected_mask[0, 1:5] = 1
+    expected_mask = np.zeros((1, 10, 512))
+    expected_mask[0, 0, 1:5] = 1
     # special tokens are not masked
-    expected_mask[:, 0] = 1
-    expected_mask[:, -1] = 1
-    assert (mask1.numpy() == expected_mask).all()
-    assert (mask2b.numpy() == expected_mask).all()
+    expected_mask[:, :,  0] = 1
+    expected_mask[:, :, -1] = 1
+    assert np.equal(mask1.numpy(), expected_mask).all()
+    assert np.equal(mask2b.numpy(), expected_mask).all()
     
-    expected_mask[0, 5] = 1
-    assert (mask2a.numpy() == expected_mask).all()
+    expected_mask[0, 0, 5] = 1
+    assert_allclose(mask2a.numpy(), expected_mask)
 
 
 def test_full_text_bert_compare():
