@@ -1,5 +1,8 @@
 import sys
 from contextlib import redirect_stdout
+import subprocess
+import re
+import pandas as pd
 
 class TeeStream:
     """Redirect stream to many different outputs.
@@ -82,3 +85,27 @@ def save_model(model, model_name, metric_data=None, tokenizer=None, encoder=None
         import joblib
         joblib.dump(encoder, os.path.join(model_dir, 'encoder.joblib'))
     
+def grep_keras_results_from_notebook(ipynb_file, filter_by='val_loss'):
+    """Parse keras results from jupyter notebook.
+    
+    Example:
+    >>> df = grep_keras_results_from_notebook('tests/data/dummy_notebook.ipynb')
+    >>> print(df)
+             loss accuracy val_loss val_accuracy
+    epoch                                       
+    1      0.0000   0.4889   0.0000       0.4000
+    2      0.0000   0.4889   0.0000       0.4000
+    """
+    pr = subprocess.run(["grep", filter_by, ipynb_file], capture_output=True)
+    out = pr.stdout
+
+    lines = out.decode('utf-8').splitlines()
+
+    rows = []
+    for i, line in enumerate(lines):
+        m = re.findall("([a-z_]*): ([0-9]+\.[0-9]*)", line)
+        if m:
+            m += [('epoch', i+1)]
+            rows.append(dict(m))
+    df = pd.DataFrame(rows).set_index('epoch')
+    return df
