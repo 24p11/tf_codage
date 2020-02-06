@@ -182,23 +182,36 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
     return train_set, validation_set, target_encoder
 
 
-def list_cmd_codes(filename_template, files_dir='.'):
+def list_cmd_codes(filename_template, files_dir='.', cmd_fmt='([0-9]+)'):
     """Find a list of cmd codes parsed from filenames.
     
-    Example:
+    Examples:
     
     >>> list_cmd_codes('dummy-actes-cmd-{}.csv', files_dir='tests/data')
     ['02', '03', '06', '12']
+    
+    >>> list_cmd_codes('no-actes-cmd-{}.csv', files_dir='tests/data')
+    []
+    
+    You can also specify the format for the CMD code. For non-numeric format,
+    
+    >>> list_cmd_codes('dummy-actes-cmd-{}.csv', files_dir='tests/data', cmd_fmt='([a-z]+)')
+    ['sample']
+    
     """
     actes = glob.glob(os.path.join(files_dir, filename_template.format('*')))
 
     def match_cmd(p):
-        m = re.match(filename_template.format('([0-9]+)'), os.path.split(p)[1])
+        m = re.match(filename_template.format(cmd_fmt), os.path.split(p)[1])
         if m:
             return m.groups(0)[0]
         else:
             return None
 
-    CMDs = sorted([match_cmd(p) for p in actes])
+    CMDs = [match_cmd(p) for p in actes]
+    
+    # filter no-matches and sort
+    
+    CMDs = sorted([cmd for cmd in CMDs if cmd])
     
     return CMDs
