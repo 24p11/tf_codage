@@ -1,7 +1,10 @@
+import os
 from sklearn.preprocessing import  MultiLabelBinarizer, LabelBinarizer, OneHotEncoder
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+import glob
+import re
     
 def load_into_dataframe(csv_path, shuffle=True, **kwargs):
     """Load and preprocess CSV file"""
@@ -177,3 +180,25 @@ def create_datasets_from_pandas(tokenize, phrase_1, target, batch_size=16, valid
     validation_set = validation_set.cache().batch(batch_size)
 
     return train_set, validation_set, target_encoder
+
+
+def list_cmd_codes(filename_template, files_dir='.'):
+    """Find a list of cmd codes parsed from filenames.
+    
+    Example:
+    
+    >>> list_cmd_codes('dummy-actes-cmd-{}.csv', files_dir='tests/data')
+    ['02', '03', '06', '12']
+    """
+    actes = glob.glob(os.path.join(files_dir, filename_template.format('*')))
+
+    def match_cmd(p):
+        m = re.match(filename_template.format('([0-9]+)'), os.path.split(p)[1])
+        if m:
+            return m.groups(0)[0]
+        else:
+            return None
+
+    CMDs = sorted([match_cmd(p) for p in actes])
+    
+    return CMDs
