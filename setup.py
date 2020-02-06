@@ -7,7 +7,7 @@ setup(
         'GPUtil',
         'matplotlib',
         'tensorflow>=2.0',
-        'transformers>=2.2',
+        'transformers==2.3.0',
         'scikit-learn>=0.21.3',
         'pandas>=0.25.3',
         'pyarrow>=0.15.1'],
