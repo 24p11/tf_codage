@@ -78,7 +78,11 @@ def make_multilabel_dataframe(csv_path, min_examples=30, use_classes=None):
     use_classes: which classes to return, the classes which are not in the
     list will be replace with 'OTHER'"""
     
-    df = load_into_dataframe(csv_path, shuffle=False)
+    if isinstance(csv_path, pd.DataFrame):
+        df = csv_path
+    else:
+        df = load_into_dataframe(csv_path, shuffle=False)
+
     if use_classes is not None:
         df.loc[~df.acte.isin(use_classes), 'acte'] = 'OTHER'
     df = aggregate_classes(df, min_examples=min_examples)
