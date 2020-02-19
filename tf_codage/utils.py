@@ -102,10 +102,12 @@ def grep_keras_results_from_notebook(ipynb_file, filter_by='val_loss'):
     lines = out.decode('utf-8').splitlines()
 
     rows = []
-    for i, line in enumerate(lines):
+    i = 0
+    for line in lines:
         m = re.findall("([a-z_]*): ([0-9]+\.[0-9]*)", line)
         if m:
-            m += [('epoch', i+1)]
+            i += 1
+            m += [('epoch', i)]
             rows.append(dict(m))
     df = pd.DataFrame(rows).set_index('epoch')
     return df
