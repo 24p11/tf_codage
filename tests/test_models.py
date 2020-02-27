@@ -187,3 +187,17 @@ def test_max_masked_pooling_layer():
     output = pooling(hidden_inputs, mask).numpy()
     expected = hidden_inputs[:, :8, :, :].reshape(n_batch, 8 * n_splits, 1, n_hidden).max(1)
     assert_allclose(expected, output)
+
+
+def test_sentence_embedding_model():
+    """Test model for calculate sentence embeddings."""
+
+    # random tokens for 2 sentences
+    tokens = [[10, 12, 31, 5], [10, 22, 5, 1]]
+
+    config = CamembertConfig(max_position_embeddings=512)
+    model = models.TFCamembertForSentenceEmbedding(config)
+
+    embeddings = model(tf.constant(tokens, dtype=tf.int32))
+
+    assert embeddings.shape == (2, 768)
