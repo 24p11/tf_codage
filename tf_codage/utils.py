@@ -28,6 +28,13 @@ def notebook_copy_stdout():
     redirect = redirect_stdout(tee)
     return redirect
 
+def print_console(*args, **kwargs):
+    """Print message to console and notebook output"""
+    
+    print(*args, **kwargs, file=sys.stdout)
+    print(*args, **kwargs, file=sys.__stdout__)
+    
+
 def download_hdfs(input_file, output_file):
     """Download files from HDFS store."""
     import sys
@@ -104,7 +111,7 @@ def grep_keras_results_from_notebook(ipynb_file, filter_by='val_loss'):
     rows = []
     i = 0
     for line in lines:
-        m = re.findall("([a-z_]*): ([0-9]+\.[0-9]*)", line)
+        m = re.findall("([a-z0-9\._]*): ([0-9]+\.[0-9]*)", line)
         if m:
             i += 1
             m += [('epoch', i)]
