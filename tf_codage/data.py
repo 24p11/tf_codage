@@ -239,16 +239,14 @@ def create_sentence_dataset(
                 max_length=sentence_embedding_model.config.max_position_embeddings - 2,
                 pad_to_max_length=False,
                 return_tensors="tf",
+                return_attention_masks=True
             )
-            input_ids = tokens["input_ids"]
-            attention_mask = tokens["attention_mask"]
-            sentence_embedding = sentence_embedding_model(
-                {"input_ids": input_ids, "attention_mask": attention_mask}
-            )
-            attention_mask = tf.ones((sentence_embedding.shape[0],), dtype=tf.int32)
+            del tokens['token_type_ids']
+            sentence_embedding = sentence_embedding_model(tokens)
+            sentence_mask = tf.ones((sentence_embedding.shape[0],), dtype=tf.int32)
             yield {
                 "inputs_embeds": sentence_embedding,
-                "attention_mask": attention_mask,
+                "attention_mask": sentence_mask,
             }
 
     dataset = tf.data.Dataset.from_generator(
