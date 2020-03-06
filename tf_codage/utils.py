@@ -118,3 +118,32 @@ def grep_keras_results_from_notebook(ipynb_file, filter_by='val_loss'):
             rows.append(dict(m))
     df = pd.DataFrame(rows).set_index('epoch')
     return df
+
+
+def batch_generator(l, batch_size):
+    """Split list l into batches of size batch_size. 
+    
+    It returns a generator of generators.
+    
+    Example:
+    >>> points = [1, 2, 3, 4, 5]
+    >>> [list(batch) for batch in batch_generator(points, 2)]
+    [[1, 2], [3, 4], [5]]
+    """
+    
+    l_iter = iter(l)
+    def single_batch():
+        yield next_item
+        try:
+            for i in range(batch_size - 1):
+                yield next(l_iter)
+        except StopIteration:
+            return
+    
+    while True:
+
+        try:
+            next_item = next(l_iter)
+            yield single_batch()
+        except StopIteration:
+            break
