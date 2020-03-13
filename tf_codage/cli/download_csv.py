@@ -26,14 +26,20 @@ def main():
     output_file = open(output_file, 'wb')
     
     # copy header to output if header defined
-    # first file is copied completely
-    print("Downloading {}".format(filenames[0]))
-    fid = conn.open(filenames[0])
-    header = fid.read()
+    # first file is copied completely 
+    # if the file is empty move to the next one
+    header = ""
+    i = 0
+    while not header:
+        print("Downloading {}".format(filenames[i]))
+        fid = conn.open(filenames[i])
+        header = fid.read()
+        fid.close()
+        i += 1
     output_file.write(header)
-    fid.close()
 
-    for f in filenames[1:]:
+
+    for f in filenames[i:]:
         print("Downloading {}".format(f))
         fid = conn.open(f)
         buffer = fid.read()
