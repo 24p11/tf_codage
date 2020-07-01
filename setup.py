@@ -13,6 +13,7 @@ setup(
         'pyarrow>=0.15.1'],
     entry_points = {
         'console_scripts': ['download_hdfs_csv=tf_codage.cli.download_csv:main',
-                            'grep_keras_progress=tf_codage.cli.grep_keras_progress:main']
+                            'grep_keras_progress=tf_codage.cli.grep_keras_progress:main',
+                            'train_model=tf_codage.cli.train_model:main']
     }
 )
