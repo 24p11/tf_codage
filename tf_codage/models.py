@@ -45,6 +45,11 @@ class TFCamembertForSentenceEmbedding(TFCamembertModel):
             sentence_embeddings = tf.reduce_mean(word_embeddings, axis=1)
 
         return sentence_embeddings
+    
+    def __getstate__(self):
+        state = super().__getstate__()
+        state.pop("_trackable_saver")
+        return state
 
 
 class FullTextBert(TFCamembertModel):
