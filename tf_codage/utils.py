@@ -3,6 +3,8 @@ from contextlib import redirect_stdout
 import subprocess
 import re
 import pandas as pd
+import os
+from itertools import chain, islice
 
 class TeeStream:
     """Redirect stream to many different outputs.
@@ -147,3 +149,34 @@ def batch_generator(l, batch_size):
             yield single_batch()
         except StopIteration:
             break
+            
+
+def split_file(input_file, out_dir, lines_per_split):
+    """Split input_file into multiple files writen in out_dir each with lines_per_split lines.
+    
+    Save header at the top of each file."""
+    
+    def chunks(iterable, n):
+        "chunks(ABCDE,2) => AB CD E"
+        iterable = iter(iterable)
+        while True:
+            try:
+                yield chain([next(iterable)], islice(iterable, n-1))
+            except StopIteration:
+                return
+
+    _, filename = os.path.split(input_file) 
+    
+    os.makedirs(out_dir, exist_ok=True)
+    
+    split_filenames = []
+    with open(input_file) as fid:
+        header = fid.readline()
+
+        for i, lines in enumerate(chunks(fid, lines_per_split)):
+            file_split = os.path.join(out_dir, '{}.split-{:04d}.csv'.format(filename, i))
+            split_filenames.append(file_split)
+            with open(file_split, 'w') as f:
+                f.write(header)
+                f.writelines(lines)
+    return split_filenames
