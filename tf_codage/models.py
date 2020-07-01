@@ -45,7 +45,7 @@ class TFCamembertForSentenceEmbedding(TFCamembertModel):
             sentence_embeddings = tf.reduce_mean(word_embeddings, axis=1)
 
         return sentence_embeddings
-    
+
     def __getstate__(self):
         state = super().__getstate__()
         state.pop("_trackable_saver")
@@ -269,4 +269,3 @@ class FullTextConfig(CamembertConfig):
         self.pool_strides = pool_strides
         self.classification_hidden_size = classification_hidden_size
         self.pool_type = pool_type
-

@@ -239,9 +239,9 @@ def create_sentence_dataset(
                 max_length=sentence_embedding_model.config.max_position_embeddings - 2,
                 pad_to_max_length=False,
                 return_tensors="tf",
-                return_attention_masks=True
+                return_attention_masks=True,
             )
-            del tokens['token_type_ids']
+            del tokens["token_type_ids"]
             sentence_embedding = sentence_embedding_model(tokens)
             sentence_mask = tf.ones((sentence_embedding.shape[0],), dtype=tf.int32)
             yield {

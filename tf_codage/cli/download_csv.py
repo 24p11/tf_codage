@@ -2,13 +2,14 @@ import argparse
 import sys
 import pyarrow
 
+
 def main():
     conn = pyarrow.hdfs.connect()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_file')
-    parser.add_argument('output_file', nargs='?')
-    parser.add_argument('--has_header', default=False, action='store_true')
+    parser.add_argument("input_file")
+    parser.add_argument("output_file", nargs="?")
+    parser.add_argument("--has_header", default=False, action="store_true")
     args = parser.parse_args()
 
     input_file = args.input_file
@@ -20,13 +21,13 @@ def main():
         output_file = args.output_file
     has_header = args.has_header
 
-    filenames = conn.ls('/user/cse170020/bartosz_csv/' + input_file)
-    filenames = [f for f in filenames if f.endswith('.csv')]
+    filenames = conn.ls("/user/cse170020/bartosz_csv/" + input_file)
+    filenames = [f for f in filenames if f.endswith(".csv")]
 
-    output_file = open(output_file, 'wb')
-    
+    output_file = open(output_file, "wb")
+
     # copy header to output if header defined
-    # first file is copied completely 
+    # first file is copied completely
     # if the file is empty move to the next one
     header = ""
     i = 0
@@ -38,13 +39,12 @@ def main():
         i += 1
     output_file.write(header)
 
-
     for f in filenames[i:]:
         print("Downloading {}".format(f))
         fid = conn.open(f)
         buffer = fid.read()
         if has_header:
-            lines = buffer.split(b'\n')
+            lines = buffer.split(b"\n")
             buffer = b"\n".join(lines[1:])
         output_file.write(buffer)
         fid.close()
