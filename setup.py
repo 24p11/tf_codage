@@ -4,6 +4,8 @@ setup(
     version="0.1",
     packages=['tf_codage'],
     install_requires=[
+        'click',
+        'papermill',
         'GPUtil',
         'matplotlib',
         'tensorflow>=2.0',

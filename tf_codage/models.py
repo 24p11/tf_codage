@@ -1,3 +1,9 @@
+"""
+Implement models for various tasks. Most of the models
+are sub-classed of the huggingface transformers models, so please
+checkout their  `docs <https://huggingface.co/transformers/>`_ for more information
+"""
+
 import os
 import GPUtil
 from transformers import TFBertForSequenceClassification, BertConfig
