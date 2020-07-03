@@ -1,0 +1,24 @@
+tf\_codage.utils.TeeStream
+==========================
+
+.. currentmodule:: tf_codage.utils
+
+.. autoclass:: TeeStream
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TeeStream.__init__
+      ~TeeStream.flush
+      ~TeeStream.write
+   
+   
+
+   
+   
+   

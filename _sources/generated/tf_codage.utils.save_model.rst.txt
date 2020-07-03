@@ -1,0 +1,6 @@
+tf\_codage.utils.save\_model
+============================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: save_model

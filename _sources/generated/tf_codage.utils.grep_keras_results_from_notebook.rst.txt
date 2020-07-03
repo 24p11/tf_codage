@@ -1,0 +1,6 @@
+tf\_codage.utils.grep\_keras\_results\_from\_notebook
+=====================================================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: grep_keras_results_from_notebook

@@ -9,6 +9,35 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
 
 .. automodule:: tf_codage.models
 
+.. currentmodule:: tf_codage
+
 .. autosummary::
    
-   tf_codage.models.TFCamembertForSentenceEmbedding
+   models.TFCamembertForSentenceEmbedding
+   models.FullTextBert
+   models.FullTextConfig
+   models.BertForMultilabelClassification
+   models.CamembertForMultilabelClassification
+   models.MeanMaskedPooling
+   models.MaxMaskedPooling
+   models.PoolingClassificationHead
+
+
+:mod:`tf_codage.utils` - common utilities
+=========================================
+
+.. automodule:: tf_codage.utils
+
+.. currentmodule:: tf_codage
+
+.. autosummary::
+   :toctree: generated
+
+   utils.TeeStream
+   utils.print_console
+   utils.download_hdfs
+   utils.notebook_copy_stdout
+   utils.save_model
+   utils.grep_keras_results_from_notebook
+   utils.batch_generator
+   utils.split_file

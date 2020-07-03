@@ -1,0 +1,6 @@
+tf\_codage.utils.split\_file
+============================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: split_file

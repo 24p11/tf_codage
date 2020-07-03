@@ -1,0 +1,6 @@
+tf\_codage.utils.download\_hdfs
+===============================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: download_hdfs

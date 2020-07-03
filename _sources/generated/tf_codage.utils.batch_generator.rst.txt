@@ -1,0 +1,6 @@
+tf\_codage.utils.batch\_generator
+=================================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: batch_generator

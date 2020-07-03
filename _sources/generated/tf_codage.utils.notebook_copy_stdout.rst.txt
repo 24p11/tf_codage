@@ -1,0 +1,6 @@
+tf\_codage.utils.notebook\_copy\_stdout
+=======================================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: notebook_copy_stdout

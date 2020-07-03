@@ -1,0 +1,6 @@
+tf\_codage.utils.print\_console
+===============================
+
+.. currentmodule:: tf_codage.utils
+
+.. autofunction:: print_console
