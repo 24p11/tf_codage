@@ -76,6 +76,8 @@ def test_train_model_output():
                 "logs",
                 "-l",
                 "0.123",
+                "--gpu",
+                "none",
             ],
         )
         assert result.exit_code == 0
