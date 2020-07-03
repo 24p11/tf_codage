@@ -80,7 +80,7 @@ def test_train_model_output():
                 "none",
             ],
         )
-        assert result.exit_code == 0
+        assert result.exit_code == 0, result.output
         with open(
             os.path.join("models", "hello-n_epochs-0-learning_rate-0.123", "test.txt")
         ) as fid:
