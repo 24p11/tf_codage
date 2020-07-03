@@ -1,3 +1,6 @@
+"""Set of helper functions to work with files, standard output etc. They are not specific to machine learning or medical informatics.
+"""
+
 import sys
 from contextlib import redirect_stdout
 import subprocess
@@ -102,12 +105,14 @@ def grep_keras_results_from_notebook(ipynb_file, filter_by="val_loss"):
     """Parse keras results from jupyter notebook.
     
     Example:
-    >>> df = grep_keras_results_from_notebook('tests/data/dummy_notebook.ipynb')
-    >>> print(df)
-             loss accuracy val_loss val_accuracy
-    epoch                                       
-    1      0.0000   0.4889   0.0000       0.4000
-    2      0.0000   0.4889   0.0000       0.4000
+
+        >>> df = grep_keras_results_from_notebook(
+        ...     'tests/data/dummy_notebook.ipynb')
+        >>> print(df)
+                 loss accuracy val_loss val_accuracy
+        epoch                                       
+        1      0.0000   0.4889   0.0000       0.4000
+        2      0.0000   0.4889   0.0000       0.4000
     """
     pr = subprocess.run(["grep", filter_by, ipynb_file], capture_output=True)
     out = pr.stdout
@@ -132,9 +137,9 @@ def batch_generator(l, batch_size):
     It returns a generator of generators.
     
     Example:
-    >>> points = [1, 2, 3, 4, 5]
-    >>> [list(batch) for batch in batch_generator(points, 2)]
-    [[1, 2], [3, 4], [5]]
+        >>> points = [1, 2, 3, 4, 5]
+        >>> [list(batch) for batch in batch_generator(points, 2)]
+        [[1, 2], [3, 4], [5]]
     """
 
     l_iter = iter(l)
