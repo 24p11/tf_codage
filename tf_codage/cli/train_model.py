@@ -12,7 +12,7 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
 
 
 @click.command()
-@click.argument("notebook")
+@click.argument("notebook") 
 @click.option(
     "-n",
     "--n-epochs",
@@ -88,7 +88,10 @@ def main(
     gpu,
     log_path,
 ):
-    """Run NOTEBOOK from the command line and set parameters of notebook variables."""
+    """Run NOTEBOOK from the command line and set parameters of notebook variables.
+
+    NOTEBOOK needs to have a cell with ``parameters`` tag as described in the documentation.
+    """
     nb_parameters = dict(N_EPOCHS=n_epochs)
     if learning_rate:
         nb_parameters["LEARNING_RATE"] = float(learning_rate)
