@@ -43,6 +43,7 @@
 <div class="section" id="train-model">
 <h2>train_model<a class="headerlink" href="#train-model" title="Permalink to this headline">¶</a></h2>
 <p>Run NOTEBOOK from the command line and set parameters of notebook variables.</p>
+<p>NOTEBOOK needs to have a cell with <code class="docutils literal notranslate"><span class="pre">parameters</span></code> tag as described in the documentation.</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>train_model <span class="o">[</span>OPTIONS<span class="o">]</span> NOTEBOOK
 </pre></div>
 </div>
@@ -114,6 +115,16 @@
 <dd><p>Required argument</p>
 </dd></dl>
 
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>NOTEBOOK must have one cell with the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> tag. You can add the tag in the cell properties side bar as described <a class="reference external" href="https://papermill.readthedocs.io/en/latest/usage-parameterize.html#jupyterlab-2-0">here</a>. There are several parameter names that are defined by default by the <code class="docutils literal notranslate"><span class="pre">train_model</span></code> tool and that you should use in your code:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">VERBOSITY</span></code>: verbosity level according to keras definition</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">N_EPOCHS</span></code>: number of training epochs (set by <code class="docutils literal notranslate"><span class="pre">-n</span></code> parameter)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code>: directory where the model outputs are written</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LEARNING_RATE</span></code>: learning rate (set by <code class="docutils literal notranslate"><span class="pre">-l</span></code> parameter)</p></li>
+</ul>
 </div>
 <div class="section" id="grep-keras-progress">
 <h2>grep_keras_progress<a class="headerlink" href="#grep-keras-progress" title="Permalink to this headline">¶</a></h2>
