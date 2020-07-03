@@ -2,10 +2,12 @@ import sys
 import argparse
 from tf_codage.utils import grep_keras_results_from_notebook
 
+
 def get_parser():
 
     parser = argparse.ArgumentParser(
-        description="Parse jupyter notebook and create a table with training progress results.")
+        description="Parse jupyter notebook and create a table with training progress results."
+    )
     parser.add_argument("ipynb_file")
     parser.add_argument(
         "csv_output_file", nargs="?", type=argparse.FileType("w"), default=sys.stdout
@@ -14,7 +16,9 @@ def get_parser():
 
     return parser
 
+
 parser = get_parser()
+
 
 def main():
 
