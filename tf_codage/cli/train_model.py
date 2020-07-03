@@ -112,8 +112,14 @@ def main(
     if suffix:
         output_core += "-" + suffix
 
+    # make log dir if does not exist
+    os.makedirs(log_path, exist_ok=True)
+
     log_path = str(Path(log_path) / (output_core + ".ipynb"))
     output_dir = str(Path(save_path) / output_core)
+
+    # create output directory
+    os.makedirs(output_dir, exist_ok=True)
 
     if os.path.isfile(log_path):
         if not force:
