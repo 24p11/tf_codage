@@ -6,6 +6,7 @@ from papermill.cli import _resolve_type
 from pathlib import Path
 import os
 import sys
+import GPUtil
 
 from stat import S_IREAD, S_IRGRP, S_IROTH
 
