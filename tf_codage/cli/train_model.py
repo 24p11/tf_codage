@@ -130,10 +130,14 @@ def main(
 
     if gpu:
         if gpu == "auto":
-            available_devices = str(GPUtil.getFirstAvailable(maxMemory=0.1)[0])
-            assert (
-                available_devices
-            ), "no free GPU found, if you want to run on CPU use `--gpu none`"
+            try:
+                available_devices = str(GPUtil.getFirstAvailable(maxMemory=0.1)[0])
+                assert (
+                    available_devices
+                ), "no free GPU found, if you want to run on CPU use `--gpu none`"
+            except ValueError:
+                print("CUDA not found.")
+                available_devices = ""
         elif gpu == "none":
             available_devices = ""
         else:
