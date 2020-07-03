@@ -24,7 +24,7 @@ jobs:
     # build docs
     - name: build sphinx docs
       run: |
-        pip install sphinx
+        pip install -r doc_requirements.txt
         cd docs && make html && cd -
     # Create an artifact of the html output.
     - uses: actions/upload-artifact@v1
