@@ -2,15 +2,24 @@ import argparse
 import sys
 import pyarrow
 
+parser = argparse.ArgumentParser(
+    description="Download spark-generated mulit-part CSV from HDFS and stich them together")
+parser.add_argument("input_file",
+    help="path on the HDFS file system, it must point to a directory with multiple CSV files")
+parser.add_argument(
+    "output_file",
+    nargs="?",
+    help="path to save the final CSV file to, prints to the terminal if not defined")
+parser.add_argument(
+    "--has_header", default=False, action="store_true", 
+    help="interpret first line of each CSV as header"
+)
 
 def main():
+    args = parser.parse_args()
+
     conn = pyarrow.hdfs.connect()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input_file")
-    parser.add_argument("output_file", nargs="?")
-    parser.add_argument("--has_header", default=False, action="store_true")
-    args = parser.parse_args()
 
     input_file = args.input_file
 

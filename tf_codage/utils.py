@@ -37,7 +37,14 @@ def notebook_copy_stdout():
 
 
 def print_console(*args, **kwargs):
-    """Print message to console and notebook output"""
+    """Print message to console and notebook output.
+
+    It can be used as a drop-in replacement for the standard
+    print function:
+        
+        >>> from tf_models.utils import print_console as print
+     
+    """
 
     print(*args, **kwargs, file=sys.stdout)
     print(*args, **kwargs, file=sys.__stdout__)

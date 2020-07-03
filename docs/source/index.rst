@@ -24,6 +24,7 @@ files.
    :caption: Contents:
 
    installation.rst
+   cli.rst
    api.rst
 
 
