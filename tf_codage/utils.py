@@ -42,7 +42,7 @@ def print_console(*args, **kwargs):
     It can be used as a drop-in replacement for the standard
     print function:
         
-        >>> from tf_models.utils import print_console as print
+        >>> from tf_codage.utils import print_console as print
      
     """
 
@@ -129,7 +129,7 @@ def grep_keras_results_from_notebook(ipynb_file, filter_by="val_loss"):
     rows = []
     i = 0
     for line in lines:
-        m = re.findall("([a-z0-9\._]*): ([0-9]+\.[0-9]*)", line)
+        m = re.findall(r"([a-z0-9\._]*): ([0-9]+\.[0-9]*)", line)
         if m:
             i += 1
             m += [("epoch", i)]
