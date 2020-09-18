@@ -306,8 +306,7 @@ class CSVDataReader:
     def __init__(
         self,
         csv_path,
-        text_col=3,
-        label_col=7,
+        columns,
         skip_rows=0,
         max_rows=None,
         doublequote=False,
@@ -315,8 +314,7 @@ class CSVDataReader:
     ):
 
         self.csv_path = csv_path
-        self.text_col = text_col
-        self.label_col = label_col
+        self.columns = columns
         self.skip_rows = skip_rows
         self.max_rows = max_rows
         self.doublequote = doublequote
@@ -329,8 +327,7 @@ class CSVDataReader:
 
         delimeter = self.delimeter
         csv_path = self.csv_path
-        text_col = self.text_col
-        label_col = self.label_col
+        columns = self.columns
         skip_rows = self.skip_rows
         max_rows = self.max_rows
         doublequote = self.doublequote
@@ -361,14 +358,11 @@ class CSVDataReader:
             header = next(reader)
             column_names = header
 
-            text_idx = (
-                column_names.index(text_col) if isinstance(text_col, str) else text_col
-            )
-            label_idx = (
-                column_names.index(label_col)
-                if isinstance(text_col, str)
-                else label_col
-            )
+            columns_idx = [
+                column_names.index(col) if isinstance(col, str) else col
+                for col in columns
+            ]
+            
             for i in range(skip_rows):
                 f.readline()
 
@@ -379,7 +373,7 @@ class CSVDataReader:
                     assert n_columns == len(
                         row
                     ), "wrong number of columns at line {}".format(reader.line_num)
-                yield row[text_idx], row[label_idx]
+                yield [row[i] for i in columns_idx]
 
 
 def make_transformers_dataset(
