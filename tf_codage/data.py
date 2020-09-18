@@ -380,3 +380,61 @@ class CSVDataReader:
                         row
                     ), "wrong number of columns at line {}".format(reader.line_num)
                 yield row[text_idx], row[label_idx]
+
+
+def make_transformers_dataset(
+    examples, transform_inputs=None, transform_labels=None, batch_size=None
+):
+    """make tf dataset compatible with transformers models.
+    
+    `examples` : tuple of string, label
+        an iterable generating training (or validation) examples
+    `transform_inputs` : function
+        a function to transform text into dict with keys `input_ids` (token indices), `attention_mask` and
+        `token_type_ids`
+    `transform_labels` : function
+        a function that transforms labels into one-hot representation
+    `batch_size` : integer
+        size of a batch
+    """
+
+    if transform_inputs is None:
+        transform_inputs = lambda X: X
+    if transform_labels is None:
+        transform_labels = lambda y: y
+
+    def data_generator():
+
+        for text, label in examples:
+            token_data = transform_inputs(text)
+            label_enc = transform_labels(label)
+
+            yield token_data, label_enc
+
+    sample_tokens, sample_labels = next(data_generator())
+    num_labels = len(sample_labels)
+    n_tokens = len(sample_tokens["input_ids"])
+
+    dataset = tf.data.Dataset.from_generator(
+        data_generator,
+        output_types=(
+            {
+                "input_ids": tf.int32,
+                "attention_mask": tf.int32,
+                "token_type_ids": tf.int32,
+            },
+            tf.int32,
+        ),
+        output_shapes=(
+            {
+                "input_ids": tf.TensorShape([n_tokens]),
+                "attention_mask": tf.TensorShape([n_tokens]),
+                "token_type_ids": tf.TensorShape([n_tokens]),
+            },
+            tf.TensorShape([num_labels]),
+        ),
+    )
+    if batch_size:
+        dataset = dataset.batch(batch_size).prefetch(2)
+
+    return dataset
