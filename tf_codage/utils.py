@@ -8,6 +8,7 @@ import re
 import pandas as pd
 import os
 from itertools import chain, islice
+from pathlib import Path
 
 
 class TeeStream:
@@ -74,18 +75,24 @@ def download_hdfs(input_file, output_file):
 
 
 def save_model(
-    model, model_name, metric_data=None, tokenizer=None, encoder=None, root_dir=".."
+    model, model_name, metric_data=None, tokenizer=None, encoder=None, root_dir="..",
+    formats=("transformers",)
 ):
     """Save model to subdirs of `root_dir` together with the metrics, encoder and tokenzier if specified."""
 
     import os
 
-    model_dir = os.path.join(root_dir, "models", model_name)
-    print("Saving model to ", model_dir)
+    model_dir = Path(root_dir, "models", model_name)
+    print("Saving model files to ", model_dir)
 
-    os.makedirs(model_dir, exist_ok=True)
 
-    model.save_pretrained(model_dir)
+    if "transformers" in formats:
+        transformers_path = model_dir / "pretrained_model_transformers"
+        os.makedirs(transformers_path, exist_ok=True)
+        model.save_pretrained(transformers_path)
+        
+    if "tf" in formats:
+        model.save(model_dir / 'trained_model.tf')
 
     if metric_data:
 
