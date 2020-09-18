@@ -61,6 +61,7 @@ class TFCamembertForSentenceEmbedding(TFCamembertModel):
 class FullTextBert(TFCamembertModel):
     """Camembert model that can handle long documents by splitting them into separate token batches.
     """
+
     def __init__(
         self,
         config,

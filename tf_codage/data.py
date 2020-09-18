@@ -8,6 +8,7 @@ import re
 import csv
 from itertools import islice
 
+
 def load_into_dataframe(csv_path, shuffle=True, **kwargs):
     """Load and preprocess CSV file"""
 
@@ -297,14 +298,22 @@ def list_cmd_codes(filename_template, files_dir=".", cmd_fmt="([0-9]+)"):
     return CMDs
 
 
-
 class CSVDataReader:
     """Read data from a CSV file. 
     
     The class reads data row-by-row and it does not load the whole file into memory."""
-    
-    def __init__(self, csv_path, text_col=3, label_col=7, skip_rows=0, max_rows=None, doublequote=False, delimeter=','):
-        
+
+    def __init__(
+        self,
+        csv_path,
+        text_col=3,
+        label_col=7,
+        skip_rows=0,
+        max_rows=None,
+        doublequote=False,
+        delimeter=",",
+    ):
+
         self.csv_path = csv_path
         self.text_col = text_col
         self.label_col = label_col
@@ -312,12 +321,12 @@ class CSVDataReader:
         self.max_rows = max_rows
         self.doublequote = doublequote
         self.delimeter = delimeter
-    
+
     # we are using iterable class rather than generator so that the
     # iteration can be restarted (for example, to train over multiple
     # epochs)
     def __iter__(self):
-            
+
         delimeter = self.delimeter
         csv_path = self.csv_path
         text_col = self.text_col
@@ -333,29 +342,41 @@ class CSVDataReader:
                 except StopIteration:
                     break
                 except csv.Error as e:
-                    print("skipping line {} due to an error: {}".format(gen.line_num, e), file=sys.stderr)
+                    print(
+                        "skipping line {} due to an error: {}".format(gen.line_num, e),
+                        file=sys.stderr,
+                    )
 
         n_columns = None
-        
-        with open(csv_path, newline='') as f:
-            
+
+        with open(csv_path, newline="") as f:
+
             # get the header and parse column names
             header = f.readline().rstrip()
             column_names = header.split(delimeter)
 
-            text_idx = column_names.index(text_col) if isinstance(text_col, str) else text_col
-            label_idx = column_names.index(label_col) if isinstance(text_col, str) else label_col
+            text_idx = (
+                column_names.index(text_col) if isinstance(text_col, str) else text_col
+            )
+            label_idx = (
+                column_names.index(label_col)
+                if isinstance(text_col, str)
+                else label_col
+            )
             for i in range(skip_rows):
                 f.readline()
-            
+
             # use CSV reader from standard library with custom dialect
             # https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters
-            reader = csv.reader(f, doublequote=doublequote, escapechar='\\', quoting=csv.QUOTE_ALL)
-            
+            reader = csv.reader(
+                f, doublequote=doublequote, escapechar="\\", quoting=csv.QUOTE_ALL
+            )
+
             for row in islice(wrapper(reader), 0, max_rows):
                 if n_columns is None:
                     n_columns = len(row)
                 else:
-                    assert n_columns == len(row), "wrong number of columns at line {}".format(reader.line_num)
+                    assert n_columns == len(
+                        row
+                    ), "wrong number of columns at line {}".format(reader.line_num)
                 yield row[text_idx], row[label_idx]
-        
