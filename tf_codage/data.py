@@ -351,9 +351,15 @@ class CSVDataReader:
 
         with open(csv_path, newline="") as f:
 
+            # use CSV reader from standard library with custom dialect
+            # https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters
+            reader = csv.reader(
+                f, doublequote=doublequote, escapechar="\\", quoting=csv.QUOTE_ALL
+            )
+
             # get the header and parse column names
-            header = f.readline().rstrip()
-            column_names = header.split(delimeter)
+            header = next(reader)
+            column_names = header
 
             text_idx = (
                 column_names.index(text_col) if isinstance(text_col, str) else text_col
@@ -365,12 +371,6 @@ class CSVDataReader:
             )
             for i in range(skip_rows):
                 f.readline()
-
-            # use CSV reader from standard library with custom dialect
-            # https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters
-            reader = csv.reader(
-                f, doublequote=doublequote, escapechar="\\", quoting=csv.QUOTE_ALL
-            )
 
             for row in islice(wrapper(reader), 0, max_rows):
                 if n_columns is None:
