@@ -381,13 +381,15 @@ def make_transformers_dataset(
 ):
     """make tf dataset compatible with transformers models.
     
-    `examples` : tuple of string, label
+    `examples` : iterable of tuples
         an iterable generating training (or validation) examples
     `transform_inputs` : function
-        a function to transform text into dict with keys `input_ids` (token indices), `attention_mask` and
+        a function to transform a set of columns from examples into a dict 
+        with keys `input_ids` (token indices), `attention_mask` and
         `token_type_ids`
     `transform_labels` : function
-        a function that transforms labels into one-hot representation
+        a function that transforms a set of columns from examples
+        into one-hot representation of the label
     `batch_size` : integer
         size of a batch
     """
