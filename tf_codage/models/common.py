@@ -93,7 +93,7 @@ class FullTextBert(TFCamembertModel):
         sep_token = self.sep_token
 
         max_batches = self.max_batches
-        input_size = 512
+        input_size = self.config.max_position_embeddings - 2
         hidden_size = self.config.hidden_size
 
         # take account of special tokens
