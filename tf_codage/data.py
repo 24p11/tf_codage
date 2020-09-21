@@ -399,9 +399,9 @@ def make_transformers_dataset(
 
     def data_generator():
 
-        for text, label in examples:
-            token_data = transform_inputs(text)
-            label_enc = transform_labels(label)
+        for training_example in examples:
+            token_data = transform_inputs(training_example)
+            label_enc = transform_labels(training_example)
 
             yield token_data, label_enc
 
