@@ -362,7 +362,7 @@ class CSVDataReader:
                 column_names.index(col) if isinstance(col, str) else col
                 for col in columns
             ]
-            
+
             for i in range(skip_rows):
                 f.readline()
 
