@@ -162,7 +162,12 @@ def main(
     print("Saving log to:", log_path)
     print("Saving model data to:", output_dir)
     pm.execute_notebook(
-        notebook, log_path, parameters=nb_parameters,
+        notebook,
+        log_path,
+        parameters=nb_parameters,
+        log_output=True,
+        stdout_file=sys.stdout,
+        stderr_file=sys.stderr,
     )
 
     print("Locking log file", log_path)
