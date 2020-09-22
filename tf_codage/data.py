@@ -385,11 +385,9 @@ def make_transformers_dataset(
         an iterable generating training (or validation) examples
     `transform_inputs` : function
         a function to transform a set of columns from examples into a dict 
-        with keys `input_ids` (token indices), `attention_mask` and
-        `token_type_ids`
     `transform_labels` : function
         a function that transforms a set of columns from examples
-        into one-hot representation of the label
+        into labels (sparse or n-hot enconded)
     `batch_size` : integer
         size of a batch
     """
@@ -408,27 +406,15 @@ def make_transformers_dataset(
             yield token_data, label_enc
 
     sample_tokens, sample_labels = next(data_generator())
-    num_labels = len(sample_labels)
-    n_tokens = len(sample_tokens["input_ids"])
+    output_shape = np.shape(sample_labels)
+
+    input_types = {k: np.asarray(v).dtype for k, v in sample_tokens.items()}
+    input_shapes = {k: np.shape(v) for k, v in sample_tokens.items()}
 
     dataset = tf.data.Dataset.from_generator(
         data_generator,
-        output_types=(
-            {
-                "input_ids": tf.int32,
-                "attention_mask": tf.int32,
-                "token_type_ids": tf.int32,
-            },
-            tf.int32,
-        ),
-        output_shapes=(
-            {
-                "input_ids": tf.TensorShape([n_tokens]),
-                "attention_mask": tf.TensorShape([n_tokens]),
-                "token_type_ids": tf.TensorShape([n_tokens]),
-            },
-            tf.TensorShape([num_labels]),
-        ),
+        output_types=(input_types, tf.int32,),
+        output_shapes=(input_shapes, tf.TensorShape(output_shape),),
     )
     if batch_size:
         dataset = dataset.batch(batch_size).prefetch(2)
