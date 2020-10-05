@@ -15,9 +15,9 @@ class FrequencyEncoder(TransformerMixin, BaseEstimator):
         counts = Counter()
         for labels in y:
             counts.update(labels)
-        self._classes = [l for l, _ in counts.most_common()] + [self._unknown_label]
-        self._classes = np.array(self._classes)
-        self._classes_map = {label: enc for enc, label in enumerate(self._classes)}
+        classes_ = [l for l, _ in counts.most_common()] + [self._unknown_label]
+        self.classes_ = np.array(classes_)
+        self._classes_map = {label: enc for enc, label in enumerate(classes_)}
         self._unknown_id = self._classes_map[self._unknown_label]
         return self
 
@@ -30,7 +30,7 @@ class FrequencyEncoder(TransformerMixin, BaseEstimator):
         return np.asarray(indices)
 
     def _decode(self, y):
-        return self._classes[np.array(y)]
+        return self.classes_[np.array(y)]
 
     def inverse_transform(self, y):
         return np.array([self._decode(y_) for y_ in y])

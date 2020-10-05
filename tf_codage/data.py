@@ -6,6 +6,7 @@ import numpy as np
 import glob
 import re
 import csv
+import sys
 from itertools import islice
 
 
@@ -413,7 +414,7 @@ def make_transformers_dataset(
 
     dataset = tf.data.Dataset.from_generator(
         data_generator,
-        output_types=(input_types, tf.int32,),
+        output_types=(input_types, tf.int64,),
         output_shapes=(input_shapes, tf.TensorShape(output_shape),),
     )
     if batch_size:

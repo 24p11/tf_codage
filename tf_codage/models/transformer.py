@@ -310,6 +310,8 @@ class Decoder(tf.keras.layers.Layer):
 
 
 class Transformer(tf.keras.Model):
+    """Complete transformer model"""
+
     def __init__(
         self,
         num_layers,
@@ -320,11 +322,26 @@ class Transformer(tf.keras.Model):
         pe_input,
         pe_target,
         rate=0.1,
-        pad_token_id=None,
+        decoder_pad_token_id=None,
         input_vocab_size=None,
     ):
+        """create a new transformer:
+        
+        - num_layer - number of layers
+        - d_model - 
+        - num_heads - number of attention heads
+        - dff - 
+        - target_vocab_size - number of symbols in target dictionary
+        - pe_input - number of position embeddings (tokens) in the encoder input
+        - pe_target - number of position embeddings in the decoder output
+        - rate - dropout rate
+        - decoder_pad_token_id - token number used for padding decoder inputs
+        - input_vocab_size - size of input vocabulary
+          if input_vocab_size = None the inputs have to be already embeddings
+          (as `input_embeds` key in input dictionary).  
+        """
         super(Transformer, self).__init__()
-        self.pad_token_id = pad_token_id
+        self.decoder_pad_token_id = decoder_pad_token_id
 
         self.encoder = Encoder(
             num_layers,
@@ -346,6 +363,14 @@ class Transformer(tf.keras.Model):
         self.final_layer = tf.keras.layers.Dense(target_vocab_size)
 
     def call(self, inputs, training=None):
+        """
+        Inputs is a dictionary with the following keys:
+        
+        - input_ids - token ids for the input sequence
+        - input_embeds - embeddings for the input sequence (if input_ids not given)
+        - codes - inputs for the decoder (normally the same as target but shifted by one token)
+        - attention_mask - mask to mark padding tokens (1 for padding token, 0 for data)
+        """
 
         if self._token_inputs:
             inp = inputs["input_ids"]
@@ -360,7 +385,7 @@ class Transformer(tf.keras.Model):
         look_ahead_mask = create_look_ahead_mask(tf.shape(tar)[1])
 
         ##  add masking non-code padded outputs
-        dec_target_padding_mask = create_padding_mask(tar, self.pad_token_id)
+        dec_target_padding_mask = create_padding_mask(tar, self.decoder_pad_token_id)
         look_ahead_mask = tf.maximum(look_ahead_mask, dec_target_padding_mask)
 
         enc_output = self.encoder(

@@ -13,16 +13,6 @@ from transformers import TFRobertaModel
 from transformers import CamembertConfig
 import tensorflow as tf
 
-os.environ["CUDA_DEVICE_ORDER"] = os.environ.get("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
-try:
-    available_devices = str(GPUtil.getFirstAvailable(maxMemory=0.1)[0])
-except:
-    available_devices = ""
-os.environ["CUDA_VISIBLE_DEVICES"] = os.environ.get(
-    "CUDA_VISIBLE_DEVICES", available_devices
-)
-
-
 class TFCamembertForSequenceClassification(TFRobertaForSequenceClassification):
     config_class = CamembertConfig
     pretrained_model_archive_map = {}
@@ -229,6 +219,9 @@ class MaxMaskedPooling(tf.keras.layers.Layer):
 
 
 class PoolingClassificationHead(tf.keras.layers.Layer):
+    """Classification head with pooling layer. The type of pooling
+    can be 'mean', 'max' or an instance of custom pooling mechanism
+    subclassed from Layer"""
     def __init__(self, config, *args, **kwargs):
         dropout_rate = config.hidden_dropout_prob
         hidden_size = config.classification_hidden_size
@@ -262,6 +255,7 @@ class PoolingClassificationHead(tf.keras.layers.Layer):
 
 
 class FullTextConfig(CamembertConfig):
+    """Extra configuration for BERT for long texts."""
 
     model_type = "camembert"
 

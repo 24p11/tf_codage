@@ -75,6 +75,10 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
     type=str,
     help="comma delimited list gpus to run the model on",
 )
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True)
 def main(
     notebook,
     n_epochs,
@@ -87,6 +91,7 @@ def main(
     save_path,
     gpu,
     log_path,
+    verbose,
 ):
     """Run NOTEBOOK from the command line and set parameters of notebook variables.
 
@@ -154,7 +159,8 @@ def main(
         print("using GPUs:", available_devices)
 
     # these params should not be present in file name
-    nb_parameters["VERBOSITY"] = 2
+    verbosity = 1 if verbose else 2
+    nb_parameters["VERBOSITY"] = verbosity
     nb_parameters["OUTPUT_DIR"] = output_dir
     nb_parameters.update(silent_cli_parameters)
 
