@@ -1,0 +1,12 @@
+tf\_codage.models.transformer.Decoder
+=====================================
+
+.. currentmodule:: tf_codage.models.transformer
+
+.. autoclass:: Decoder
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

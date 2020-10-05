@@ -8,6 +8,7 @@
     <title>tf_codage API &#8212; tf_codage 0.1 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/css-style.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -15,7 +16,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="tf_codage.utils.TeeStream" href="generated/tf_codage.utils.TeeStream.html" />
+    <link rel="next" title="tf_codage.models.transformer.Encoder" href="generated/tf_codage.models.transformer.Encoder.html" />
     <link rel="prev" title="Command line tools" href="cli.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -36,10 +37,11 @@
   <div class="section" id="tf-codage-api">
 <h1><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API<a class="headerlink" href="#tf-codage-api" title="Permalink to this headline">¶</a></h1>
 <p>You will find here the documentation of all modules within the <code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> package. This documentation is automatically generated from the docstring in the code and can be also found using the <cite>help</cite> command or the quick-help Jupyter magic <code class="docutils literal notranslate"><span class="pre">command?</span></code>.</p>
-<div class="section" id="tf-codage-models-base-deep-learning-models">
-<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models<a class="headerlink" href="#tf-codage-models-base-deep-learning-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf_codage.models">
+<span id="tf-codage-models-base-deep-learning-models"></span><h2><a class="reference internal" href="#module-tf_codage.models" title="tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code></a> - base deep learning models<a class="headerlink" href="#module-tf_codage.models" title="Permalink to this headline">¶</a></h2>
+<p>Collection of implemented models.</p>
 <div class="section" id="module-tf_codage.models.common">
-<span id="tf-codage-models-common-long-text-transformers-models"></span><h3><a class="reference internal" href="#module-tf_codage.models.common" title="tf_codage.models.common"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models.common</span></code></a> - long-text transformers models<a class="headerlink" href="#module-tf_codage.models.common" title="Permalink to this headline">¶</a></h3>
+<span id="tf-codage-models-common-long-text-transformers-models"></span><h3><a class="reference internal" href="#module-tf_codage.models.common" title="tf_codage.models.common"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models.common</span></code></a> – long-text transformers models<a class="headerlink" href="#module-tf_codage.models.common" title="Permalink to this headline">¶</a></h3>
 <p>Implement models for various tasks. Most of the models
 are sub-classed of the huggingface transformers models, so please
 checkout their  <a class="reference external" href="https://huggingface.co/transformers/">docs</a> for more information</p>
@@ -72,6 +74,29 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code>(*args, **kwargs)</p></td>
 <td><p>Classification head with pooling layer.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="module-tf_codage.models.transformer">
+<span id="tf-codage-models-transformer-vanilla-transformer-model"></span><h3><a class="reference internal" href="#module-tf_codage.models.transformer" title="tf_codage.models.transformer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models.transformer</span></code></a> – vanilla transformer model<a class="headerlink" href="#module-tf_codage.models.transformer" title="Permalink to this headline">¶</a></h3>
+<p>Tensorflow implementation of Transformer model:</p>
+<p>Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin, <a class="reference external" href="https://arxiv.org/pdf/1706.03762.pdf">Attention is all you need</a>, 2017</p>
+<p>Adapted from tensorflow <a class="reference external" href="https://github.com/tensorflow/docs/blob/e876022a05aaabfd2340bf84fff1464f14429377/site/en/tutorials/text/transformer.ipynb">tutorial</a>.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.transformer.Encoder.html#tf_codage.models.transformer.Encoder" title="tf_codage.models.transformer.Encoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Encoder</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Encoder part of the transformer architecture.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.transformer.Decoder.html#tf_codage.models.transformer.Decoder" title="tf_codage.models.transformer.Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decoder</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer" title="tf_codage.models.transformer.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Complete transformer model</p></td>
 </tr>
 </tbody>
 </table>
@@ -137,7 +162,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command line tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#tf-codage-models-base-deep-learning-models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
 </ul>
 </li>
@@ -148,7 +173,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="cli.html" title="previous chapter">Command line tools</a></li>
-      <li>Next: <a href="generated/tf_codage.utils.TeeStream.html" title="next chapter">tf_codage.utils.TeeStream</a></li>
+      <li>Next: <a href="generated/tf_codage.models.transformer.Encoder.html" title="next chapter">tf_codage.models.transformer.Encoder</a></li>
   </ul></li>
 </ul>
 </div>
