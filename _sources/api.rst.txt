@@ -7,7 +7,10 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
 :mod:`tf_codage.models` - base deep learning models
 ===================================================
 
-.. automodule:: tf_codage.models
+:mod:`tf_codage.models.common` - long-text transformers models
+--------------------------------------------------------------
+
+.. automodule:: tf_codage.models.common
 
 .. currentmodule:: tf_codage
 

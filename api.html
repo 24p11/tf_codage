@@ -36,8 +36,10 @@
   <div class="section" id="tf-codage-api">
 <h1><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API<a class="headerlink" href="#tf-codage-api" title="Permalink to this headline">¶</a></h1>
 <p>You will find here the documentation of all modules within the <code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> package. This documentation is automatically generated from the docstring in the code and can be also found using the <cite>help</cite> command or the quick-help Jupyter magic <code class="docutils literal notranslate"><span class="pre">command?</span></code>.</p>
-<div class="section" id="module-tf_codage.models">
-<span id="tf-codage-models-base-deep-learning-models"></span><h2><a class="reference internal" href="#module-tf_codage.models" title="tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code></a> - base deep learning models<a class="headerlink" href="#module-tf_codage.models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="tf-codage-models-base-deep-learning-models">
+<h2><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models<a class="headerlink" href="#tf-codage-models-base-deep-learning-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-tf_codage.models.common">
+<span id="tf-codage-models-common-long-text-transformers-models"></span><h3><a class="reference internal" href="#module-tf_codage.models.common" title="tf_codage.models.common"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models.common</span></code></a> - long-text transformers models<a class="headerlink" href="#module-tf_codage.models.common" title="Permalink to this headline">¶</a></h3>
 <p>Implement models for various tasks. Most of the models
 are sub-classed of the huggingface transformers models, so please
 checkout their  <a class="reference external" href="https://huggingface.co/transformers/">docs</a> for more information</p>
@@ -54,7 +56,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <td><p>Camembert model that can handle long documents by splitting them into separate token batches.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.FullTextConfig</span></code>([pool_size, …])</p></td>
-<td><p></p></td>
+<td><p>Extra configuration for BERT for long texts.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.BertForMultilabelClassification</span></code>(…)</p></td>
 <td><p>Bert for sequence classification with sigmoid activation in the output layer</p></td>
@@ -69,10 +71,11 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <td><p>Max pooling with strides and mask</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<td><p>Classification head with pooling layer.</p></td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div class="section" id="module-tf_codage.utils">
 <span id="tf-codage-utils-common-utilities"></span><h2><a class="reference internal" href="#module-tf_codage.utils" title="tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code></a> - common utilities<a class="headerlink" href="#module-tf_codage.utils" title="Permalink to this headline">¶</a></h2>
@@ -134,7 +137,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command line tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tf-codage-models-base-deep-learning-models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
 </ul>
 </li>
@@ -175,7 +178,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
       &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
