@@ -7,8 +7,10 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
 :mod:`tf_codage.models` - base deep learning models
 ===================================================
 
-:mod:`tf_codage.models.common` - long-text transformers models
---------------------------------------------------------------
+.. automodule:: tf_codage.models
+
+:mod:`tf_codage.models.common` -- long-text transformers models
+---------------------------------------------------------------
 
 .. automodule:: tf_codage.models.common
 
@@ -24,6 +26,22 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
    models.MeanMaskedPooling
    models.MaxMaskedPooling
    models.PoolingClassificationHead
+
+:mod:`tf_codage.models.transformer` -- vanilla transformer model
+----------------------------------------------------------------
+
+.. automodule:: tf_codage.models.transformer
+
+.. currentmodule:: tf_codage.models.transformer
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   Encoder
+   Decoder
+   Transformer
+
 
 
 :mod:`tf_codage.utils` - common utilities

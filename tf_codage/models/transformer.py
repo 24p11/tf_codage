@@ -1,11 +1,12 @@
 """
 Tensorflow implementation of Transformer model:
 
-https://arxiv.org/pdf/1706.03762.pdf
+Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin, `Attention is all you need`_, 2017
 
-Adapted from:
+Adapted from tensorflow `tutorial`_.
 
-https://github.com/tensorflow/docs/blob/e876022a05aaabfd2340bf84fff1464f14429377/site/en/tutorials/text/transformer.ipynb
+.. _tutorial: https://github.com/tensorflow/docs/blob/e876022a05aaabfd2340bf84fff1464f14429377/site/en/tutorials/text/transformer.ipynb
+.. _Attention is all you need: https://arxiv.org/pdf/1706.03762.pdf
 """
 
 import numpy as np
@@ -175,6 +176,8 @@ class EncoderLayer(tf.keras.layers.Layer):
 
 
 class Encoder(tf.keras.layers.Layer):
+    """Encoder part of the transformer architecture."""
+
     def __init__(
         self,
         num_layers,
@@ -185,7 +188,22 @@ class Encoder(tf.keras.layers.Layer):
         rate=0.1,
         input_vocab_size=None,
     ):
-        """encoder layer. if input_vocab_size is None do not add embedding layer"""
+        """Creates an encoder layer.
+
+        Encoder layer takes a sequence of token ids (or embeddings, if `input_vocab_size` is None)
+        and returns a sequence of contextualised embeddings.
+
+        Args:
+            num_layers: number of encoder layers
+            d_model: number of units in hidden layers (and embedding size)
+            num_heads: number of attention heads
+            dff: number of units in feedforward layers
+            maximum_position_encoding: maximum input sequence length
+            rate: dropout rate
+            input_vocab_size: size of input vocabulary
+              (or None in which case the inputs must be
+              already embeddings).
+        """
         super(Encoder, self).__init__()
 
         self.d_model = d_model
@@ -204,6 +222,15 @@ class Encoder(tf.keras.layers.Layer):
         self.dropout = tf.keras.layers.Dropout(rate)
 
     def call(self, x, training, mask):
+        """Run the encoder layer with the inputs.
+
+        Args:
+            x: sequence of token ids or embeddings
+              (if `input_vocabulary_size` is None)
+            training: use True if used during training and False 
+              for evaluation
+            mask: mask for padding tokens
+        """
 
         seq_len = tf.shape(x)[1]
 
@@ -325,20 +352,29 @@ class Transformer(tf.keras.Model):
         decoder_pad_token_id=None,
         input_vocab_size=None,
     ):
-        """create a new transformer:
-        
-        - num_layer - number of layers
-        - d_model - 
-        - num_heads - number of attention heads
-        - dff - 
-        - target_vocab_size - number of symbols in target dictionary
-        - pe_input - number of position embeddings (tokens) in the encoder input
-        - pe_target - number of position embeddings in the decoder output
-        - rate - dropout rate
-        - decoder_pad_token_id - token number used for padding decoder inputs
-        - input_vocab_size - size of input vocabulary
-          if input_vocab_size = None the inputs have to be already embeddings
-          (as `input_embeds` key in input dictionary).  
+        """Creates a new transformer.
+
+        Creates a complete encoder-decoder architecture for transformer.
+        It can accept both the embeddings or learn the embeddings on its
+        own.
+
+        Args:
+            num_layer: number of layers
+            d_model: size of embedding vector and hidden layers
+            num_heads:  number of attention heads
+            dff:  number of units in feedforward sublayers
+            target_vocab_size: number of symbols in target dictionary
+            pe_input: number of position embeddings (tokens) in the encoder input
+            pe_target: number of position embeddings in the decoder output
+            rate: dropout rate
+            decoder_pad_token_id: token number used for padding decoder inputs
+            input_vocab_size: size of input vocabulary
+              if input_vocab_size = None the inputs have to be already embeddings
+              (as `input_embeds` key in input dictionary).
+
+        Returns:
+            an instance of transformer model.
+
         """
         super(Transformer, self).__init__()
         self.decoder_pad_token_id = decoder_pad_token_id
