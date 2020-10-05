@@ -12,7 +12,7 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
 
 
 @click.command()
-@click.argument("notebook") 
+@click.argument("notebook")
 @click.option(
     "-n",
     "--n-epochs",
@@ -78,7 +78,9 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
 @click.option(
     "-v",
     "--verbose",
-    is_flag=True)
+    is_flag=True,
+    help="make the output more verbose (progress bar, etc.)",
+)
 def main(
     notebook,
     n_epochs,

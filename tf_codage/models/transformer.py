@@ -290,6 +290,8 @@ class DecoderLayer(tf.keras.layers.Layer):
 
 
 class Decoder(tf.keras.layers.Layer):
+    """Decoder part of the transformer architecture."""
+
     def __init__(
         self,
         num_layers,
@@ -300,6 +302,18 @@ class Decoder(tf.keras.layers.Layer):
         maximum_position_encoding,
         rate=0.1,
     ):
+        """Initialize a decoder.
+
+        Args:
+            num_layers: number of encoder layers
+            d_model: number of units in hidden layers (and embedding size)
+            num_heads: number of attention heads
+            dff: number of units in feedforward layers
+            target_vocab_size: size of the vocabulary
+            maximum_position_encoding: maximum input sequence length
+            rate: dropout rate
+        """
+
         super(Decoder, self).__init__()
 
         self.d_model = d_model

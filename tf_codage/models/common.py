@@ -13,6 +13,7 @@ from transformers import TFRobertaModel
 from transformers import CamembertConfig
 import tensorflow as tf
 
+
 class TFCamembertForSequenceClassification(TFRobertaForSequenceClassification):
     config_class = CamembertConfig
     pretrained_model_archive_map = {}
@@ -50,6 +51,23 @@ class TFCamembertForSentenceEmbedding(TFCamembertModel):
 
 class FullTextBert(TFCamembertModel):
     """Camembert model that can handle long documents by splitting them into separate token batches.
+
+    The model produces contextualised embeddings and needs to be paired with a task head 
+    (classification etc.)
+
+    Typical usage example:
+
+      >>> tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
+      >>> cls_token = tokenizer.cls_token_id
+      >>> sep_token = tokenizer.sep_token_id
+      >>> config = FullTextConfig()
+      >>> model = FullTextBert(config, cls_token=cls_token, sep_token=sep_token)
+      >>> inputs = {
+      ...     "input_ids": tf.constant([[1, 2, 3]]),
+      ...     "attention_mask": tf.constant([[0, 0, 0]])}
+      >>> embeddings, mask = model(inputs)
+
+
     """
 
     def __init__(
@@ -63,9 +81,15 @@ class FullTextBert(TFCamembertModel):
         **kwargs
     ):
         """
-        
-        layer_id: which layer to use in the output, layer_id=0 is the first layer,
-          layer_id=-1 (the default) is the last layer
+        Initialize a FullTextBert model with given parameters.
+                  
+        Args:
+           config: instance ``FullTextConfig`` with model parameters
+           cls_token: token id corresponding to the CLS token
+           sep_token: token id corresponding to the SEP token
+           max_batches: maximum number of sequences to split the document into.
+           layer_id: which layer to use in the output, layer_id=0 is the first layer,
+             layer_id=-1 (the default) is the last layer
         """
 
         if layer_id != -1:
@@ -79,6 +103,16 @@ class FullTextBert(TFCamembertModel):
         self.max_batches = max_batches
 
     def call(self, inputs, **kwargs):
+        """Evalulate the model for inputs.
+
+        Args:
+           inputs: hugging-face like inputs (normally dict with keys
+             ``input_ids``, ``token_type_ids``, ``attention_mask``
+
+        Returns:
+           a tuple of contextualised embeddings and mask
+        """
+
         cls_token = self.cls_token
         sep_token = self.sep_token
 
@@ -219,9 +253,12 @@ class MaxMaskedPooling(tf.keras.layers.Layer):
 
 
 class PoolingClassificationHead(tf.keras.layers.Layer):
-    """Classification head with pooling layer. The type of pooling
-    can be 'mean', 'max' or an instance of custom pooling mechanism
-    subclassed from Layer"""
+    """Classification head with pooling layer.
+
+    The type of pooling can be 'mean', 'max' or an instance of
+    a custom pooling mechanism subclassed from ``Layer``.
+    """
+
     def __init__(self, config, *args, **kwargs):
         dropout_rate = config.hidden_dropout_prob
         hidden_size = config.classification_hidden_size

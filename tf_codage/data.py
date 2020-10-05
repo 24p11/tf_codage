@@ -1,3 +1,10 @@
+"""
+Import and prepare data to be used with TensorFlow models.
+
+It covers a variety of different input data formats (pandas DataFrame, CSV)
+and model types (single or multilabel).
+"""
+
 import os
 from sklearn.preprocessing import MultiLabelBinarizer, LabelBinarizer, OneHotEncoder
 import tensorflow as tf
@@ -313,6 +320,19 @@ class CSVDataReader:
         doublequote=False,
         delimeter=",",
     ):
+        """Open a CSV file.
+
+        Args:
+            csv_path: full path to the file
+            columns: columns to read (the file must have a header)
+            skip_rows: number of rows to skip from the beginning of the file
+            max_rows: last row to read
+            doubleqoute: flag to mark whether the quotes in string are double for escaping
+            delimeter: delimter to separate columns
+
+        Returns:
+            an iterator over rows, each element is a tuple of the selected columns.
+        """
 
         self.csv_path = csv_path
         self.columns = columns
@@ -380,17 +400,25 @@ class CSVDataReader:
 def make_transformers_dataset(
     examples, transform_inputs=None, transform_labels=None, batch_size=None
 ):
-    """make tf dataset compatible with transformers models.
+    """Make tf dataset object to use with transformer-like models.
+
+    For compatibility with HuggingFace transformers models the
+    `transform_inputs` function must return a dictionary with keys
+    ``input_ids``, ``attention_mask`` and ``token_type_ids``.
     
-    `examples` : iterable of tuples
-        an iterable generating training (or validation) examples
-    `transform_inputs` : function
-        a function to transform a set of columns from examples into a dict 
-    `transform_labels` : function
-        a function that transforms a set of columns from examples
-        into labels (sparse or n-hot enconded)
-    `batch_size` : integer
-        size of a batch
+    Args:
+        examples: iterable of tuples
+          an iterable generating training (or validation) examples
+        transform_inputs: function
+          a function to transform a set of columns from examples into a dict 
+        transform_labels: function
+          a function that transforms a set of columns from examples
+          into labels (sparse or n-hot enconded)
+        batch_size: integer
+          size of the batch, no batching if None
+
+    Returns:
+       TensorFlow Dataset object, each element is a tuple of inputs and target.
     """
 
     if transform_inputs is None:
