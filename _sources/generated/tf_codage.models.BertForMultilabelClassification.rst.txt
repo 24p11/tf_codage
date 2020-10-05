@@ -1,0 +1,12 @@
+tf\_codage.models.BertForMultilabelClassification
+=================================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: BertForMultilabelClassification
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tf_codage.models.transformer.Decoder &#8212; tf_codage 0.1 documentation</title>
+    <title>tf_codage.models.PoolingClassificationHead &#8212; tf_codage 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/css-style.css" />
@@ -16,8 +16,8 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="tf_codage.models.transformer.Transformer" href="tf_codage.models.transformer.Transformer.html" />
-    <link rel="prev" title="tf_codage.models.transformer.Encoder" href="tf_codage.models.transformer.Encoder.html" />
+    <link rel="next" title="tf_codage.models.FullTextConfig" href="tf_codage.models.FullTextConfig.html" />
+    <link rel="prev" title="tf_codage.models.MaxMaskedPooling" href="tf_codage.models.MaxMaskedPooling.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,34 +34,22 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="tf-codage-models-transformer-decoder">
-<h1>tf_codage.models.transformer.Decoder<a class="headerlink" href="#tf-codage-models-transformer-decoder" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="tf-codage-models-poolingclassificationhead">
+<h1>tf_codage.models.PoolingClassificationHead<a class="headerlink" href="#tf-codage-models-poolingclassificationhead" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="tf_codage.models.transformer.Decoder">
-<em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.transformer.</code><code class="sig-name descname">Decoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#Decoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.Decoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decoder part of the transformer architecture.</p>
+<dt id="tf_codage.models.PoolingClassificationHead">
+<em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.</code><code class="sig-name descname">PoolingClassificationHead</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Classification head with pooling layer.</p>
+<p>The type of pooling can be ‘mean’, ‘max’ or an instance of
+a custom pooling mechanism subclassed from <code class="docutils literal notranslate"><span class="pre">Layer</span></code>.</p>
 <dl class="py method">
-<dt id="tf_codage.models.transformer.Decoder.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_layers</span></em>, <em class="sig-param"><span class="n">d_model</span></em>, <em class="sig-param"><span class="n">num_heads</span></em>, <em class="sig-param"><span class="n">dff</span></em>, <em class="sig-param"><span class="n">target_vocab_size</span></em>, <em class="sig-param"><span class="n">maximum_position_encoding</span></em>, <em class="sig-param"><span class="n">rate</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#Decoder.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.Decoder.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize a decoder.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>num_layers</strong> – number of encoder layers</p></li>
-<li><p><strong>d_model</strong> – number of units in hidden layers (and embedding size)</p></li>
-<li><p><strong>num_heads</strong> – number of attention heads</p></li>
-<li><p><strong>dff</strong> – number of units in feedforward layers</p></li>
-<li><p><strong>target_vocab_size</strong> – size of the vocabulary</p></li>
-<li><p><strong>maximum_position_encoding</strong> – maximum input sequence length</p></li>
-<li><p><strong>rate</strong> – dropout rate</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dt id="tf_codage.models.PoolingClassificationHead.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
-<dt id="tf_codage.models.transformer.Decoder.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">enc_output</span></em>, <em class="sig-param"><span class="n">training</span></em>, <em class="sig-param"><span class="n">look_ahead_mask</span></em>, <em class="sig-param"><span class="n">padding_mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#Decoder.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.Decoder.call" title="Permalink to this definition">¶</a></dt>
+<dt id="tf_codage.models.PoolingClassificationHead.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is where the layer’s logic lives.</p>
 <p>Note here that <cite>call()</cite> method in <cite>tf.keras</cite> is little bit different
 from <cite>keras</cite> API. In <cite>keras</cite> API, you can pass support masking for
@@ -118,8 +106,8 @@ method to support masking.</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
-      <li>Previous: <a href="tf_codage.models.transformer.Encoder.html" title="previous chapter">tf_codage.models.transformer.Encoder</a></li>
-      <li>Next: <a href="tf_codage.models.transformer.Transformer.html" title="next chapter">tf_codage.models.transformer.Transformer</a></li>
+      <li>Previous: <a href="tf_codage.models.MaxMaskedPooling.html" title="previous chapter">tf_codage.models.MaxMaskedPooling</a></li>
+      <li>Next: <a href="tf_codage.models.FullTextConfig.html" title="next chapter">tf_codage.models.FullTextConfig</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -154,7 +142,7 @@ method to support masking.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="../_sources/generated/tf_codage.models.transformer.Decoder.rst.txt"
+      <a href="../_sources/generated/tf_codage.models.PoolingClassificationHead.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

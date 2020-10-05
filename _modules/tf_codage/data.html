@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tf_codage.data &#8212; tf_codage 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/css-style.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for tf_codage.data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Import and prepare data to be used with TensorFlow models.</span>
+
+<span class="sd">It covers a variety of different input data formats (pandas DataFrame, CSV)</span>
+<span class="sd">and model types (single or multilabel).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MultiLabelBinarizer</span><span class="p">,</span> <span class="n">LabelBinarizer</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">islice</span>
+
+
+<span class="k">def</span> <span class="nf">load_into_dataframe</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load and preprocess CSV file&quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">escapechar</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;encounter_num&quot;</span><span class="p">,</span> <span class="s2">&quot;acte&quot;</span><span class="p">,</span> <span class="s2">&quot;texte&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_num&quot;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;encounter_num&quot;</span><span class="p">,</span> <span class="s2">&quot;acte&quot;</span><span class="p">,</span> <span class="s2">&quot;texte&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_num&quot;</span><span class="p">,</span> <span class="s2">&quot;libelle&quot;</span><span class="p">]</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">column_names</span>
+
+    <span class="c1"># shuffle the data frame</span>
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">13341</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">dataframe_to_multilabel</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add multilabel target to data frame&quot;&quot;&quot;</span>
+
+    <span class="c1"># transform into multi-labels</span>
+    <span class="n">gb</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;encounter_num&quot;</span><span class="p">,</span> <span class="s2">&quot;texte&quot;</span><span class="p">])</span>
+    <span class="n">df_new</span> <span class="o">=</span> <span class="n">gb</span><span class="p">[</span><span class="s2">&quot;acte&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">df_new</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;target&quot;</span>
+    <span class="n">df_encoded</span> <span class="o">=</span> <span class="n">df_new</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">df_encoded</span>
+
+
+<span class="k">def</span> <span class="nf">dataframe_to_paired_sentences</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fraction_data</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Add columns for paired sentences task&quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">libelle</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span>
+
+    <span class="c1"># keep only top codes</span>
+    <span class="n">top_acte</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">acte</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+    <span class="c1"># df = df[df.acte.isin(top_acte)]</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># for matching sentences</span>
+
+    <span class="c1"># add shuffled definitions</span>
+    <span class="n">shuffled_libelle</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">libelle</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">13341</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df2</span><span class="o">.</span><span class="n">libelle</span> <span class="o">=</span> <span class="n">shuffled_libelle</span>
+
+    <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># for not matching</span>
+
+    <span class="n">df_union</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># randomly shuffle rows</span>
+    <span class="n">df_union</span> <span class="o">=</span> <span class="n">df_union</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="n">fraction_data</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">93313</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+        <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_union</span>
+
+
+<span class="k">def</span> <span class="nf">aggregate_classes</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;acte&quot;</span><span class="p">,</span> <span class="n">other_name</span><span class="o">=</span><span class="s2">&quot;OTHER&quot;</span><span class="p">,</span> <span class="n">min_examples</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combine infrequent classes into a common class&quot;&quot;&quot;</span>
+
+    <span class="n">column</span> <span class="o">=</span> <span class="s2">&quot;acte&quot;</span>
+    <span class="n">examples_per_label</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+    <span class="n">small_labels</span> <span class="o">=</span> <span class="n">examples_per_label</span><span class="p">[</span>
+        <span class="n">examples_per_label</span> <span class="o">&lt;</span> <span class="n">min_examples</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">small_labels</span><span class="p">),</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OTHER&quot;</span>
+
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<span class="k">def</span> <span class="nf">make_multilabel_dataframe</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">min_examples</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">use_classes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make multilabel dataframe.</span>
+<span class="sd">    </span>
+<span class="sd">    use_classes: which classes to return, the classes which are not in the</span>
+<span class="sd">    list will be replace with &#39;OTHER&#39;&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">csv_path</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">load_into_dataframe</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">use_classes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">df</span><span class="o">.</span><span class="n">acte</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">use_classes</span><span class="p">),</span> <span class="s2">&quot;acte&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OTHER&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">aggregate_classes</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">min_examples</span><span class="o">=</span><span class="n">min_examples</span><span class="p">)</span>
+    <span class="n">num_labels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">acte</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe_to_multilabel</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">13341</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">num_labels</span>
+
+
+<span class="k">def</span> <span class="nf">make_paired_sentences_dataframe</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">fraction_data</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make paired sentences dataframe&quot;&quot;&quot;</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">load_into_dataframe</span><span class="p">(</span><span class="n">csv_path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">dataframe_to_paired_sentences</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">fraction_data</span><span class="o">=</span><span class="n">fraction_data</span><span class="p">)</span>
+    <span class="n">num_labels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">num_labels</span>
+
+
+<span class="k">def</span> <span class="nf">make_tokenize</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">max_len</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make tokenize function that uses the tokenizer object&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_tokenize</span><span class="p">(</span><span class="n">seq_1</span><span class="p">,</span> <span class="n">seq_2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tokenize input sequeneces&quot;&quot;&quot;</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode_plus</span><span class="p">(</span>
+            <span class="n">seq_1</span><span class="p">,</span>
+            <span class="n">seq_2</span><span class="p">,</span>
+            <span class="n">add_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span>
+            <span class="n">truncation_strategy</span><span class="o">=</span><span class="s2">&quot;only_first&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">n_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;token_type_ids&quot;</span><span class="p">]:</span>
+            <span class="n">outputs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="n">n_tokens</span><span class="p">)</span>
+        <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="n">n_tokens</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputs</span>
+
+    <span class="k">return</span> <span class="n">_tokenize</span>
+
+
+<span class="k">class</span> <span class="nc">DummyEncoder</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">input</span>
+
+
+<span class="k">def</span> <span class="nf">create_datasets_from_pandas</span><span class="p">(</span>
+    <span class="n">tokenize</span><span class="p">,</span>
+    <span class="n">phrase_1</span><span class="p">,</span>
+    <span class="n">target</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">phrase_2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoder</span><span class="o">=</span><span class="s2">&quot;multilabel_binarizer&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create TF datasets (validation and training) from pandas series&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">encoder</span> <span class="o">==</span> <span class="s2">&quot;multilabel_binarizer&quot;</span><span class="p">:</span>
+        <span class="n">target_encoder</span> <span class="o">=</span> <span class="n">MultiLabelBinarizer</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">encoder</span> <span class="o">==</span> <span class="s2">&quot;label_binarizer&quot;</span><span class="p">:</span>
+        <span class="n">target_encoder</span> <span class="o">=</span> <span class="n">LabelBinarizer</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">):</span>
+        <span class="n">target_encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_encoder</span> <span class="o">=</span> <span class="n">DummyEncoder</span><span class="p">()</span>
+
+    <span class="n">encoded_value</span> <span class="o">=</span> <span class="n">target_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">encoded_value</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">tf_dtypes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="s2">&quot;token_type_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">},</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">tf_shapes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>
+            <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>
+            <span class="s2">&quot;token_type_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>
+        <span class="p">},</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">(</span><span class="n">shape</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_dataset_gen</span><span class="p">(</span><span class="n">data_slice</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;make generator for data generation from a subset of data&quot;&quot;&quot;</span>
+        <span class="n">phrase_1_set</span> <span class="o">=</span> <span class="n">phrase_1</span><span class="p">[</span><span class="n">data_slice</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">phrase_2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">phrase_2_set</span> <span class="o">=</span> <span class="n">phrase_2</span><span class="p">[</span><span class="n">data_slice</span><span class="p">]</span>
+        <span class="n">target_set</span> <span class="o">=</span> <span class="n">target</span><span class="p">[</span><span class="n">data_slice</span><span class="p">]</span>
+
+        <span class="k">def</span> <span class="nf">_generator</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">phrase_2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span><span class="n">tokenize</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">phrase_1_set</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">tokenize</span><span class="p">(</span><span class="n">r_1</span><span class="p">,</span> <span class="n">r_2</span><span class="p">)</span> <span class="k">for</span> <span class="n">r_1</span><span class="p">,</span> <span class="n">r_2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">phrase_1_set</span><span class="p">,</span> <span class="n">phrase_2_set</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="n">target_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">target_set</span><span class="o">.</span><span class="n">to_list</span><span class="p">()))</span>
+
+        <span class="k">return</span> <span class="n">_generator</span>
+
+    <span class="n">n_train</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">validation_split</span><span class="p">))</span>
+
+    <span class="n">train_set_gen</span> <span class="o">=</span> <span class="n">_dataset_gen</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_train</span><span class="p">))</span>
+    <span class="n">validation_set_gen</span> <span class="o">=</span> <span class="n">_dataset_gen</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">n_train</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+    <span class="n">train_set</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span><span class="n">train_set_gen</span><span class="p">,</span> <span class="n">tf_dtypes</span><span class="p">,</span> <span class="n">tf_shapes</span><span class="p">)</span>
+    <span class="n">validation_set</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span>
+        <span class="n">validation_set_gen</span><span class="p">,</span> <span class="n">tf_dtypes</span><span class="p">,</span> <span class="n">tf_shapes</span>
+    <span class="p">)</span>
+
+    <span class="n">train_set</span> <span class="o">=</span> <span class="n">train_set</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="n">validation_set</span> <span class="o">=</span> <span class="n">validation_set</span><span class="o">.</span><span class="n">cache</span><span class="p">()</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">train_set</span><span class="p">,</span> <span class="n">validation_set</span><span class="p">,</span> <span class="n">target_encoder</span>
+
+
+<span class="k">def</span> <span class="nf">create_sentence_dataset</span><span class="p">(</span>
+    <span class="n">documents</span><span class="p">,</span>
+    <span class="n">sentence_tokenizer</span><span class="p">,</span>
+    <span class="n">word_tokenizer</span><span class="p">,</span>
+    <span class="n">sentence_embedding_model</span><span class="p">,</span>
+    <span class="n">max_sentences</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">def</span> <span class="nf">generator</span><span class="p">():</span>
+
+        <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">documents</span><span class="p">:</span>
+            <span class="n">sentences</span> <span class="o">=</span> <span class="n">sentence_tokenizer</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="n">sentences</span> <span class="o">=</span> <span class="n">sentences</span><span class="p">[:</span><span class="n">max_sentences</span><span class="p">]</span>
+            <span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">word_tokenizer</span><span class="o">.</span><span class="n">batch_encode_plus</span><span class="p">(</span>
+                <span class="n">sentences</span><span class="p">,</span>
+                <span class="n">add_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">max_length</span><span class="o">=</span><span class="n">sentence_embedding_model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_position_embeddings</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">pad_to_max_length</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;tf&quot;</span><span class="p">,</span>
+                <span class="n">return_attention_masks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">del</span> <span class="n">tokens</span><span class="p">[</span><span class="s2">&quot;token_type_ids&quot;</span><span class="p">]</span>
+            <span class="n">sentence_embedding</span> <span class="o">=</span> <span class="n">sentence_embedding_model</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+            <span class="n">sentence_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">sentence_embedding</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="p">{</span>
+                <span class="s2">&quot;inputs_embeds&quot;</span><span class="p">:</span> <span class="n">sentence_embedding</span><span class="p">,</span>
+                <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">sentence_mask</span><span class="p">,</span>
+            <span class="p">}</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span>
+        <span class="n">generator</span><span class="p">,</span>
+        <span class="n">output_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;inputs_embeds&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">},</span>
+        <span class="n">output_shapes</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;inputs_embeds&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]),</span>
+            <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">([</span><span class="kc">None</span><span class="p">]),</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span>
+
+
+<span class="k">def</span> <span class="nf">list_cmd_codes</span><span class="p">(</span><span class="n">filename_template</span><span class="p">,</span> <span class="n">files_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">cmd_fmt</span><span class="o">=</span><span class="s2">&quot;([0-9]+)&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find a list of cmd codes parsed from filenames.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; list_cmd_codes(&#39;dummy-actes-cmd-{}.csv&#39;, files_dir=&#39;tests/data&#39;)</span>
+<span class="sd">    [&#39;02&#39;, &#39;03&#39;, &#39;06&#39;, &#39;12&#39;]</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; list_cmd_codes(&#39;no-actes-cmd-{}.csv&#39;, files_dir=&#39;tests/data&#39;)</span>
+<span class="sd">    []</span>
+<span class="sd">    </span>
+<span class="sd">    You can also specify the format for the CMD code. For non-numeric format,</span>
+<span class="sd">    </span>
+<span class="sd">    &gt;&gt;&gt; list_cmd_codes(&#39;dummy-actes-cmd-{}.csv&#39;, files_dir=&#39;tests/data&#39;, cmd_fmt=&#39;([a-z]+)&#39;)</span>
+<span class="sd">    [&#39;sample&#39;]</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actes</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">files_dir</span><span class="p">,</span> <span class="n">filename_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">match_cmd</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filename_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd_fmt</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">p</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">CMDs</span> <span class="o">=</span> <span class="p">[</span><span class="n">match_cmd</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">actes</span><span class="p">]</span>
+
+    <span class="c1"># filter no-matches and sort</span>
+
+    <span class="n">CMDs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">cmd</span> <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">CMDs</span> <span class="k">if</span> <span class="n">cmd</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">CMDs</span>
+
+
+<div class="viewcode-block" id="CSVDataReader"><a class="viewcode-back" href="../../generated/tf_codage.data.CSVDataReader.html#tf_codage.data.CSVDataReader">[docs]</a><span class="k">class</span> <span class="nc">CSVDataReader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Read data from a CSV file. </span>
+<span class="sd">    </span>
+<span class="sd">    The class reads data row-by-row and it does not load the whole file into memory.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CSVDataReader.__init__"><a class="viewcode-back" href="../../generated/tf_codage.data.CSVDataReader.html#tf_codage.data.CSVDataReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">csv_path</span><span class="p">,</span>
+        <span class="n">columns</span><span class="p">,</span>
+        <span class="n">skip_rows</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">max_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">doublequote</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">delimeter</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open a CSV file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            csv_path: full path to the file</span>
+<span class="sd">            columns: columns to read (the file must have a header)</span>
+<span class="sd">            skip_rows: number of rows to skip from the beginning of the file</span>
+<span class="sd">            max_rows: last row to read</span>
+<span class="sd">            doubleqoute: flag to mark whether the quotes in string are double for escaping</span>
+<span class="sd">            delimeter: delimter to separate columns</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            an iterator over rows, each element is a tuple of the selected columns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">csv_path</span> <span class="o">=</span> <span class="n">csv_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip_rows</span> <span class="o">=</span> <span class="n">skip_rows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_rows</span> <span class="o">=</span> <span class="n">max_rows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doublequote</span> <span class="o">=</span> <span class="n">doublequote</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimeter</span> <span class="o">=</span> <span class="n">delimeter</span></div>
+
+    <span class="c1"># we are using iterable class rather than generator so that the</span>
+    <span class="c1"># iteration can be restarted (for example, to train over multiple</span>
+    <span class="c1"># epochs)</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">delimeter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimeter</span>
+        <span class="n">csv_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">csv_path</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">skip_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_rows</span>
+        <span class="n">max_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_rows</span>
+        <span class="n">doublequote</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">doublequote</span>
+
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">except</span> <span class="n">csv</span><span class="o">.</span><span class="n">Error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;skipping line </span><span class="si">{}</span><span class="s2"> due to an error: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gen</span><span class="o">.</span><span class="n">line_num</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span>
+                        <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+        <span class="n">n_columns</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+            <span class="c1"># use CSV reader from standard library with custom dialect</span>
+            <span class="c1"># https://docs.python.org/3/library/csv.html#dialects-and-formatting-parameters</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">doublequote</span><span class="o">=</span><span class="n">doublequote</span><span class="p">,</span> <span class="n">escapechar</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quoting</span><span class="o">=</span><span class="n">csv</span><span class="o">.</span><span class="n">QUOTE_ALL</span>
+            <span class="p">)</span>
+
+            <span class="c1"># get the header and parse column names</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+            <span class="n">column_names</span> <span class="o">=</span> <span class="n">header</span>
+
+            <span class="n">columns_idx</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">column_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">col</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">skip_rows</span><span class="p">):</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">islice</span><span class="p">(</span><span class="n">wrapper</span><span class="p">(</span><span class="n">reader</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">max_rows</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">n_columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">n_columns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">n_columns</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">row</span>
+                    <span class="p">),</span> <span class="s2">&quot;wrong number of columns at line </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">line_num</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">columns_idx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="make_transformers_dataset"><a class="viewcode-back" href="../../generated/tf_codage.data.make_transformers_dataset.html#tf_codage.data.make_transformers_dataset">[docs]</a><span class="k">def</span> <span class="nf">make_transformers_dataset</span><span class="p">(</span>
+    <span class="n">examples</span><span class="p">,</span> <span class="n">transform_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transform_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make tf dataset object to use with transformer-like models.</span>
+
+<span class="sd">    For compatibility with HuggingFace transformers models the</span>
+<span class="sd">    `transform_inputs` function must return a dictionary with keys</span>
+<span class="sd">    ``input_ids``, ``attention_mask`` and ``token_type_ids``.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        examples: iterable of tuples</span>
+<span class="sd">          an iterable generating training (or validation) examples</span>
+<span class="sd">        transform_inputs: function</span>
+<span class="sd">          a function to transform a set of columns from examples into a dict </span>
+<span class="sd">        transform_labels: function</span>
+<span class="sd">          a function that transforms a set of columns from examples</span>
+<span class="sd">          into labels (sparse or n-hot enconded)</span>
+<span class="sd">        batch_size: integer</span>
+<span class="sd">          size of the batch, no batching if None</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       TensorFlow Dataset object, each element is a tuple of inputs and target.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">transform_inputs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">transform_inputs</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">:</span> <span class="n">X</span>
+    <span class="k">if</span> <span class="n">transform_labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">transform_labels</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">y</span>
+
+    <span class="k">def</span> <span class="nf">data_generator</span><span class="p">():</span>
+
+        <span class="k">for</span> <span class="n">training_example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
+            <span class="n">token_data</span> <span class="o">=</span> <span class="n">transform_inputs</span><span class="p">(</span><span class="n">training_example</span><span class="p">)</span>
+            <span class="n">label_enc</span> <span class="o">=</span> <span class="n">transform_labels</span><span class="p">(</span><span class="n">training_example</span><span class="p">)</span>
+
+            <span class="k">yield</span> <span class="n">token_data</span><span class="p">,</span> <span class="n">label_enc</span>
+
+    <span class="n">sample_tokens</span><span class="p">,</span> <span class="n">sample_labels</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">data_generator</span><span class="p">())</span>
+    <span class="n">output_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">sample_labels</span><span class="p">)</span>
+
+    <span class="n">input_types</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sample_tokens</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">input_shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sample_tokens</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_generator</span><span class="p">(</span>
+        <span class="n">data_generator</span><span class="p">,</span>
+        <span class="n">output_types</span><span class="o">=</span><span class="p">(</span><span class="n">input_types</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">,),</span>
+        <span class="n">output_shapes</span><span class="o">=</span><span class="p">(</span><span class="n">input_shapes</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorShape</span><span class="p">(</span><span class="n">output_shape</span><span class="p">),),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">batch_size</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">tf_codage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command line tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,12 @@
+tf\_codage.models.MeanMaskedPooling
+===================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: MeanMaskedPooling
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tf_codage.models.FullTextBert &#8212; tf_codage 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/css-style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tf_codage.models.BertForMultilabelClassification" href="tf_codage.models.BertForMultilabelClassification.html" />
+    <link rel="prev" title="tf_codage.models.TFCamembertForSentenceEmbedding" href="tf_codage.models.TFCamembertForSentenceEmbedding.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tf-codage-models-fulltextbert">
+<h1>tf_codage.models.FullTextBert<a class="headerlink" href="#tf-codage-models-fulltextbert" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="tf_codage.models.FullTextBert">
+<em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.</code><code class="sig-name descname">FullTextBert</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Camembert model that can handle long documents by splitting them into separate token batches.</p>
+<p>The model produces contextualised embeddings and needs to be paired with a task head
+(classification etc.)</p>
+<p>Typical usage example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">CamembertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;camembert-base&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">cls_token_id</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sep_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">sep_token_id</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">FullTextConfig</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">FullTextBert</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cls_token</span><span class="o">=</span><span class="n">cls_token</span><span class="p">,</span> <span class="n">sep_token</span><span class="o">=</span><span class="n">sep_token</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]),</span>
+<span class="gp">... </span>    <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">embeddings</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="tf_codage.models.FullTextBert.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">cls_token</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sep_token</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_batches</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">layer_id</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a FullTextBert model with given parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – instance <code class="docutils literal notranslate"><span class="pre">FullTextConfig</span></code> with model parameters</p></li>
+<li><p><strong>cls_token</strong> – token id corresponding to the CLS token</p></li>
+<li><p><strong>sep_token</strong> – token id corresponding to the SEP token</p></li>
+<li><p><strong>max_batches</strong> – maximum number of sequences to split the document into.</p></li>
+<li><p><strong>layer_id</strong> – which layer to use in the output, layer_id=0 is the first layer,
+layer_id=-1 (the default) is the last layer</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf_codage.models.FullTextBert.call">
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert.call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evalulate the model for inputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>inputs</strong> – hugging-face like inputs (normally dict with keys
+<code class="docutils literal notranslate"><span class="pre">input_ids</span></code>, <code class="docutils literal notranslate"><span class="pre">token_type_ids</span></code>, <code class="docutils literal notranslate"><span class="pre">attention_mask</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a tuple of contextualised embeddings and mask</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tf_codage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command line tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.data</span></code> – parsing and formatting data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
+      <li>Previous: <a href="tf_codage.models.TFCamembertForSentenceEmbedding.html" title="previous chapter">tf_codage.models.TFCamembertForSentenceEmbedding</a></li>
+      <li>Next: <a href="tf_codage.models.BertForMultilabelClassification.html" title="next chapter">tf_codage.models.BertForMultilabelClassification</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/tf_codage.models.FullTextBert.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

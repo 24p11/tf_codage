@@ -1,0 +1,22 @@
+tf\_codage.data.CSVDataReader
+=============================
+
+.. currentmodule:: tf_codage.data
+
+.. autoclass:: CSVDataReader
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CSVDataReader.__init__
+   
+   
+
+   
+   
+   

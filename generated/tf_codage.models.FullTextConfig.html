@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tf_codage.models.FullTextConfig &#8212; tf_codage 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/css-style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tf_codage.models.transformer.Encoder" href="tf_codage.models.transformer.Encoder.html" />
+    <link rel="prev" title="tf_codage.models.PoolingClassificationHead" href="tf_codage.models.PoolingClassificationHead.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tf-codage-models-fulltextconfig">
+<h1>tf_codage.models.FullTextConfig<a class="headerlink" href="#tf-codage-models-fulltextconfig" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="tf_codage.models.FullTextConfig">
+<em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.</code><code class="sig-name descname">FullTextConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pool_size</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">pool_strides</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">classification_hidden_size</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">pool_type</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extra configuration for BERT for long texts.</p>
+<dl class="py method">
+<dt id="tf_codage.models.FullTextConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pool_size</span><span class="o">=</span><span class="default_value">512</span></em>, <em class="sig-param"><span class="n">pool_strides</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">classification_hidden_size</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">pool_type</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextConfig.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs RobertaConfig.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tf_codage.models.FullTextConfig.__init__" title="tf_codage.models.FullTextConfig.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([pool_size, pool_strides, …])</p></td>
+<td><p>Constructs RobertaConfig.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code>(config_dict, **kwargs)</p></td>
+<td><p>Instantiates a <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code> from a Python dictionary of parameters.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_json_file</span></code>(json_file)</p></td>
+<td><p>Instantiates a <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code> from the path to a JSON file of parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_pretrained</span></code>(…)</p></td>
+<td><p>Instantiate a <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code> (or a derived class) from a pretrained model configuration.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_config_dict</span></code>(…)</p></td>
+<td><p>From a <code class="docutils literal notranslate"><span class="pre">pretrained_model_name_or_path</span></code>, resolve to a dictionary of parameters, to be used for instantiating a <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code> using <code class="docutils literal notranslate"><span class="pre">from_dict</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_pretrained</span></code>(save_directory)</p></td>
+<td><p>Save a configuration object to the directory <code class="docutils literal notranslate"><span class="pre">save_directory</span></code>, so that it can be re-loaded using the <code class="xref py py-func docutils literal notranslate"><span class="pre">from_pretrained()</span></code> class method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code>()</p></td>
+<td><p>Serializes this instance to a Python dictionary.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_diff_dict</span></code>()</p></td>
+<td><p>Removes all attributes from config which correspond to the default config attributes for better readability and serializes to a Python dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json_file</span></code>(json_file_path[, use_diff])</p></td>
+<td><p>Save this instance to a JSON file.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_json_string</span></code>([use_diff])</p></td>
+<td><p>Serializes this instance to a JSON string.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(config_dict)</p></td>
+<td><p>Updates attributes of this class with attributes from <code class="docutils literal notranslate"><span class="pre">config_dict</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_type</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_labels</span></code></p></td>
+<td><p>The number of labels for classification models.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_return_dict</span></code></p></td>
+<td><p>Whether or not return <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelOutput</span></code> instead of tuples.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tf_codage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command line tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.data</span></code> – parsing and formatting data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
+      <li>Previous: <a href="tf_codage.models.PoolingClassificationHead.html" title="previous chapter">tf_codage.models.PoolingClassificationHead</a></li>
+      <li>Next: <a href="tf_codage.models.transformer.Encoder.html" title="next chapter">tf_codage.models.transformer.Encoder</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/tf_codage.models.FullTextConfig.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,12 @@
+tf\_codage.models.TFCamembertForSentenceEmbedding
+=================================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: TFCamembertForSentenceEmbedding
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

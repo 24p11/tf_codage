@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tf_codage.models.common &#8212; tf_codage 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/css-style.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for tf_codage.models.common</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implement models for various tasks. Most of the models</span>
+<span class="sd">are sub-classed of the huggingface transformers models, so please</span>
+<span class="sd">checkout their  `docs &lt;https://huggingface.co/transformers/&gt;`_ for more information</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">GPUtil</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TFBertForSequenceClassification</span><span class="p">,</span> <span class="n">BertConfig</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">CamembertTokenizer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TFRobertaForSequenceClassification</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TFRobertaModel</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">CamembertConfig</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+
+<span class="k">class</span> <span class="nc">TFCamembertForSequenceClassification</span><span class="p">(</span><span class="n">TFRobertaForSequenceClassification</span><span class="p">):</span>
+    <span class="n">config_class</span> <span class="o">=</span> <span class="n">CamembertConfig</span>
+    <span class="n">pretrained_model_archive_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="k">class</span> <span class="nc">TFCamembertModel</span><span class="p">(</span><span class="n">TFRobertaModel</span><span class="p">):</span>
+    <span class="n">config_class</span> <span class="o">=</span> <span class="n">CamembertConfig</span>
+    <span class="n">pretrained_model_archive_map</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="TFCamembertForSentenceEmbedding"><a class="viewcode-back" href="../../../generated/tf_codage.models.TFCamembertForSentenceEmbedding.html#tf_codage.models.TFCamembertForSentenceEmbedding">[docs]</a><span class="k">class</span> <span class="nc">TFCamembertForSentenceEmbedding</span><span class="p">(</span><span class="n">TFCamembertModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Camembert model for calculating sentence embeddings through an average of</span>
+<span class="sd">    word embeddings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TFCamembertForSentenceEmbedding.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.TFCamembertForSentenceEmbedding.html#tf_codage.models.TFCamembertForSentenceEmbedding.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">word_embeddings</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;attention_mask&quot;</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+            <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">attention_mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">sentence_embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span>
+                <span class="n">word_embeddings</span> <span class="o">*</span> <span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sentence_embeddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">word_embeddings</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sentence_embeddings</span></div>
+
+    <span class="k">def</span> <span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__getstate__</span><span class="p">()</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_trackable_saver&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="FullTextBert"><a class="viewcode-back" href="../../../generated/tf_codage.models.FullTextBert.html#tf_codage.models.FullTextBert">[docs]</a><span class="k">class</span> <span class="nc">FullTextBert</span><span class="p">(</span><span class="n">TFCamembertModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Camembert model that can handle long documents by splitting them into separate token batches.</span>
+
+<span class="sd">    The model produces contextualised embeddings and needs to be paired with a task head </span>
+<span class="sd">    (classification etc.)</span>
+
+<span class="sd">    Typical usage example:</span>
+
+<span class="sd">      &gt;&gt;&gt; tokenizer = CamembertTokenizer.from_pretrained(&quot;camembert-base&quot;)</span>
+<span class="sd">      &gt;&gt;&gt; cls_token = tokenizer.cls_token_id</span>
+<span class="sd">      &gt;&gt;&gt; sep_token = tokenizer.sep_token_id</span>
+<span class="sd">      &gt;&gt;&gt; config = FullTextConfig()</span>
+<span class="sd">      &gt;&gt;&gt; model = FullTextBert(config, cls_token=cls_token, sep_token=sep_token)</span>
+<span class="sd">      &gt;&gt;&gt; inputs = {</span>
+<span class="sd">      ...     &quot;input_ids&quot;: tf.constant([[1, 2, 3]]),</span>
+<span class="sd">      ...     &quot;attention_mask&quot;: tf.constant([[0, 0, 0]])}</span>
+<span class="sd">      &gt;&gt;&gt; embeddings, mask = model(inputs)</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FullTextBert.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.FullTextBert.html#tf_codage.models.FullTextBert.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">inputs</span><span class="p">,</span>
+        <span class="n">cls_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sep_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_batches</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">layer_id</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a FullTextBert model with given parameters.</span>
+<span class="sd">                  </span>
+<span class="sd">        Args:</span>
+<span class="sd">           config: instance ``FullTextConfig`` with model parameters</span>
+<span class="sd">           cls_token: token id corresponding to the CLS token</span>
+<span class="sd">           sep_token: token id corresponding to the SEP token</span>
+<span class="sd">           max_batches: maximum number of sequences to split the document into.</span>
+<span class="sd">           layer_id: which layer to use in the output, layer_id=0 is the first layer,</span>
+<span class="sd">             layer_id=-1 (the default) is the last layer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">layer_id</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">output_hidden_states</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_id</span> <span class="o">=</span> <span class="n">layer_id</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">cls_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sep_token</span> <span class="o">=</span> <span class="n">sep_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_batches</span> <span class="o">=</span> <span class="n">max_batches</span></div>
+
+<div class="viewcode-block" id="FullTextBert.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.FullTextBert.html#tf_codage.models.FullTextBert.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Evalulate the model for inputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">           inputs: hugging-face like inputs (normally dict with keys</span>
+<span class="sd">             ``input_ids``, ``token_type_ids``, ``attention_mask``</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           a tuple of contextualised embeddings and mask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">cls_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls_token</span>
+        <span class="n">sep_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sep_token</span>
+
+        <span class="n">max_batches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_batches</span>
+        <span class="n">input_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_position_embeddings</span> <span class="o">-</span> <span class="mi">2</span>
+        <span class="n">hidden_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span>
+
+        <span class="c1"># take account of special tokens</span>
+        <span class="n">bert_seq_len</span> <span class="o">=</span> <span class="n">input_size</span> <span class="o">-</span> <span class="mi">2</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">input_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span>
+            <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_ids</span> <span class="o">=</span> <span class="n">inputs</span>
+            <span class="n">attention_mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">n_seq</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">=</span> <span class="n">input_ids</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">padded_inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="p">,</span>
+            <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_batches</span> <span class="o">*</span> <span class="n">bert_seq_len</span> <span class="o">-</span> <span class="n">seq_len</span><span class="p">]],</span>
+            <span class="n">constant_values</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">new_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">padded_inputs</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">bert_seq_len</span><span class="p">])</span>
+
+        <span class="n">padded_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">new_tensor</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">constant_values</span><span class="o">=</span><span class="n">cls_token</span><span class="p">)</span>
+        <span class="n">padded_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+            <span class="n">padded_tensor</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">constant_values</span><span class="o">=</span><span class="n">sep_token</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attention_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">padded_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+                <span class="n">attention_mask</span><span class="p">,</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_batches</span> <span class="o">*</span> <span class="n">bert_seq_len</span> <span class="o">-</span> <span class="n">seq_len</span><span class="p">]],</span>
+                <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">padded_mask</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">bert_seq_len</span><span class="p">])</span>
+            <span class="n">attention_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">attention_mask</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roberta</span><span class="p">(</span><span class="n">padded_tensor</span><span class="p">,</span> <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_id</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sequence_output</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_id</span><span class="p">]</span>
+
+        <span class="n">reshaped_outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="n">sequence_output</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_batches</span><span class="p">,</span> <span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">attention_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reshaped_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">attention_mask</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_batches</span><span class="p">,</span> <span class="n">input_size</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reshaped_mask</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">reshaped_outputs</span><span class="p">,</span> <span class="n">reshaped_mask</span></div></div>
+
+
+<div class="viewcode-block" id="BertForMultilabelClassification"><a class="viewcode-back" href="../../../generated/tf_codage.models.BertForMultilabelClassification.html#tf_codage.models.BertForMultilabelClassification">[docs]</a><span class="k">class</span> <span class="nc">BertForMultilabelClassification</span><span class="p">(</span><span class="n">TFBertForSequenceClassification</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Bert for sequence classification with sigmoid activation in the output layer&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BertForMultilabelClassification.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.BertForMultilabelClassification.html#tf_codage.models.BertForMultilabelClassification.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">activation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Activation</span><span class="p">(</span><span class="s2">&quot;sigmoid&quot;</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">activation</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">probs</span></div></div>
+
+
+<div class="viewcode-block" id="CamembertForMultilabelClassification"><a class="viewcode-back" href="../../../generated/tf_codage.models.CamembertForMultilabelClassification.html#tf_codage.models.CamembertForMultilabelClassification">[docs]</a><span class="k">class</span> <span class="nc">CamembertForMultilabelClassification</span><span class="p">(</span><span class="n">TFCamembertForSequenceClassification</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Camembert for sequence classification with sigmoid activation in the output layer&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CamembertForMultilabelClassification.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.CamembertForMultilabelClassification.html#tf_codage.models.CamembertForMultilabelClassification.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">activation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Activation</span><span class="p">(</span><span class="s2">&quot;sigmoid&quot;</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">activation</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">probs</span></div></div>
+
+
+<div class="viewcode-block" id="MeanMaskedPooling"><a class="viewcode-back" href="../../../generated/tf_codage.models.MeanMaskedPooling.html#tf_codage.models.MeanMaskedPooling">[docs]</a><span class="k">class</span> <span class="nc">MeanMaskedPooling</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mean pooling with strides and mask&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MeanMaskedPooling.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.MeanMaskedPooling.html#tf_codage.models.MeanMaskedPooling.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pool_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pool_size</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pool_strides</span>
+        <span class="n">num_labels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">num_labels</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">AveragePooling1D</span><span class="p">(</span><span class="n">pool_size</span><span class="p">,</span> <span class="n">strides</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MeanMaskedPooling.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.MeanMaskedPooling.html#tf_codage.models.MeanMaskedPooling.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">hidden_size</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_splits</span> <span class="o">*</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">]</span>
+        <span class="n">flattened_inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flattened_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_splits</span> <span class="o">*</span> <span class="n">n_tokens</span><span class="p">)),</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">flattened_inputs</span> <span class="o">=</span> <span class="n">flattened_inputs</span> <span class="o">*</span> <span class="n">flattened_mask</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span><span class="p">(</span><span class="n">flattened_inputs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pooled_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span><span class="p">(</span><span class="n">flattened_mask</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pooled_mask</span> <span class="o">+</span> <span class="mf">1e-9</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div></div>
+
+
+<div class="viewcode-block" id="MaxMaskedPooling"><a class="viewcode-back" href="../../../generated/tf_codage.models.MaxMaskedPooling.html#tf_codage.models.MaxMaskedPooling">[docs]</a><span class="k">class</span> <span class="nc">MaxMaskedPooling</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Max pooling with strides and mask&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MaxMaskedPooling.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.MaxMaskedPooling.html#tf_codage.models.MaxMaskedPooling.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pool_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pool_size</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pool_strides</span>
+        <span class="n">num_labels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">num_labels</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">MaxPooling1D</span><span class="p">(</span><span class="n">pool_size</span><span class="p">,</span> <span class="n">strides</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MaxMaskedPooling.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.MaxMaskedPooling.html#tf_codage.models.MaxMaskedPooling.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">hidden_size</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_splits</span> <span class="o">*</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">]</span>
+        <span class="n">flattened_inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flattened_mask</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_splits</span> <span class="o">*</span> <span class="n">n_tokens</span><span class="p">)),</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">-</span> <span class="mi">1</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="mf">1e30</span>
+            <span class="n">flattened_inputs</span> <span class="o">=</span> <span class="n">flattened_inputs</span> <span class="o">+</span> <span class="n">flattened_mask</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span><span class="p">(</span><span class="n">flattened_inputs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span></div></div>
+
+
+<div class="viewcode-block" id="PoolingClassificationHead"><a class="viewcode-back" href="../../../generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead">[docs]</a><span class="k">class</span> <span class="nc">PoolingClassificationHead</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Classification head with pooling layer.</span>
+
+<span class="sd">    The type of pooling can be &#39;mean&#39;, &#39;max&#39; or an instance of</span>
+<span class="sd">    a custom pooling mechanism subclassed from ``Layer``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PoolingClassificationHead.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">dropout_rate</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">hidden_dropout_prob</span>
+        <span class="n">hidden_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">classification_hidden_size</span>
+        <span class="n">num_labels</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">num_labels</span>
+        <span class="n">pool_type</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pool_type</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pool_type</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span> <span class="o">=</span> <span class="n">MeanMaskedPooling</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">pool_type</span> <span class="o">==</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span> <span class="o">=</span> <span class="n">MaxMaskedPooling</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">pool_type</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span> <span class="o">=</span> <span class="n">pool_type</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Flatten</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">BatchNormalization</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dense2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;softmax&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoolingClassificationHead.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pooling</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense1</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dense2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div></div>
+
+
+<div class="viewcode-block" id="FullTextConfig"><a class="viewcode-back" href="../../../generated/tf_codage.models.FullTextConfig.html#tf_codage.models.FullTextConfig">[docs]</a><span class="k">class</span> <span class="nc">FullTextConfig</span><span class="p">(</span><span class="n">CamembertConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extra configuration for BERT for long texts.&quot;&quot;&quot;</span>
+
+    <span class="n">model_type</span> <span class="o">=</span> <span class="s2">&quot;camembert&quot;</span>
+
+<div class="viewcode-block" id="FullTextConfig.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.FullTextConfig.html#tf_codage.models.FullTextConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pool_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">pool_strides</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">classification_hidden_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">pool_type</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_size</span> <span class="o">=</span> <span class="n">pool_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_strides</span> <span class="o">=</span> <span class="n">pool_strides</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classification_hidden_size</span> <span class="o">=</span> <span class="n">classification_hidden_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pool_type</span> <span class="o">=</span> <span class="n">pool_type</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">tf_codage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command line tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

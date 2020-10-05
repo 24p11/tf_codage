@@ -16,7 +16,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="tf_codage.models.transformer.Encoder" href="generated/tf_codage.models.transformer.Encoder.html" />
+    <link rel="next" title="tf_codage.models.TFCamembertForSentenceEmbedding" href="generated/tf_codage.models.TFCamembertForSentenceEmbedding.html" />
     <link rel="prev" title="Command line tools" href="cli.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -51,29 +51,37 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.TFCamembertForSentenceEmbedding</span></code>(…)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.TFCamembertForSentenceEmbedding.html#tf_codage.models.TFCamembertForSentenceEmbedding" title="tf_codage.models.TFCamembertForSentenceEmbedding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.TFCamembertForSentenceEmbedding</span></code></a>(…)</p></td>
 <td><p>Camembert model for calculating sentence embeddings through an average of word embeddings.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.FullTextBert</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.FullTextBert.html#tf_codage.models.FullTextBert" title="tf_codage.models.FullTextBert"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.FullTextBert</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Camembert model that can handle long documents by splitting them into separate token batches.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.FullTextConfig</span></code>([pool_size, …])</p></td>
-<td><p>Extra configuration for BERT for long texts.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.BertForMultilabelClassification</span></code>(…)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.BertForMultilabelClassification.html#tf_codage.models.BertForMultilabelClassification" title="tf_codage.models.BertForMultilabelClassification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.BertForMultilabelClassification</span></code></a>(…)</p></td>
 <td><p>Bert for sequence classification with sigmoid activation in the output layer</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.CamembertForMultilabelClassification</span></code>(…)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.CamembertForMultilabelClassification.html#tf_codage.models.CamembertForMultilabelClassification" title="tf_codage.models.CamembertForMultilabelClassification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.CamembertForMultilabelClassification</span></code></a>(…)</p></td>
 <td><p>Camembert for sequence classification with sigmoid activation in the output layer</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MeanMaskedPooling</span></code>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.MeanMaskedPooling.html#tf_codage.models.MeanMaskedPooling" title="tf_codage.models.MeanMaskedPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MeanMaskedPooling</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Mean pooling with strides and mask</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MaxMaskedPooling</span></code>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.MaxMaskedPooling.html#tf_codage.models.MaxMaskedPooling" title="tf_codage.models.MaxMaskedPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MaxMaskedPooling</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Max pooling with strides and mask</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead" title="tf_codage.models.PoolingClassificationHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Classification head with pooling layer.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.FullTextConfig.html#tf_codage.models.FullTextConfig" title="tf_codage.models.FullTextConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.FullTextConfig</span></code></a>([pool_size, …])</p></td>
+<td><p>Extra configuration for BERT for long texts.</p></td>
 </tr>
 </tbody>
 </table>
@@ -93,7 +101,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <td><p>Encoder part of the transformer architecture.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.transformer.Decoder.html#tf_codage.models.transformer.Decoder" title="tf_codage.models.transformer.Decoder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Decoder</span></code></a>(*args, **kwargs)</p></td>
-<td><p></p></td>
+<td><p>Decoder part of the transformer architecture.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer" title="tf_codage.models.transformer.Transformer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Transformer</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Complete transformer model</p></td>
@@ -101,6 +109,26 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 </tbody>
 </table>
 </div>
+</div>
+<div class="section" id="module-tf_codage.data">
+<span id="tf-codage-data-parsing-and-formatting-data"></span><h2><a class="reference internal" href="#module-tf_codage.data" title="tf_codage.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.data</span></code></a> – parsing and formatting data<a class="headerlink" href="#module-tf_codage.data" title="Permalink to this headline">¶</a></h2>
+<p>Import and prepare data to be used with TensorFlow models.</p>
+<p>It covers a variety of different input data formats (pandas DataFrame, CSV)
+and model types (single or multilabel).</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.data.make_transformers_dataset.html#tf_codage.data.make_transformers_dataset" title="tf_codage.data.make_transformers_dataset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.make_transformers_dataset</span></code></a>(examples[, …])</p></td>
+<td><p>Make tf dataset object to use with transformer-like models.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.data.CSVDataReader.html#tf_codage.data.CSVDataReader" title="tf_codage.data.CSVDataReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data.CSVDataReader</span></code></a>(csv_path, columns[, …])</p></td>
+<td><p>Read data from a CSV file.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="module-tf_codage.utils">
 <span id="tf-codage-utils-common-utilities"></span><h2><a class="reference internal" href="#module-tf_codage.utils" title="tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code></a> - common utilities<a class="headerlink" href="#module-tf_codage.utils" title="Permalink to this headline">¶</a></h2>
@@ -163,6 +191,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command line tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.data</span></code> – parsing and formatting data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
 </ul>
 </li>
@@ -173,7 +202,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="cli.html" title="previous chapter">Command line tools</a></li>
-      <li>Next: <a href="generated/tf_codage.models.transformer.Encoder.html" title="next chapter">tf_codage.models.transformer.Encoder</a></li>
+      <li>Next: <a href="generated/tf_codage.models.TFCamembertForSentenceEmbedding.html" title="next chapter">tf_codage.models.TFCamembertForSentenceEmbedding</a></li>
   </ul></li>
 </ul>
 </div>

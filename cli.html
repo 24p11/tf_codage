@@ -112,7 +112,8 @@
 <dl class="std option">
 <dt id="cmdoption-train_model-v">
 <span id="cmdoption-train_model-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-train_model-v" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>make the output more verbose (progress bar, etc.)</p>
+</dd></dl>
 
 <p class="rubric">Arguments</p>
 <dl class="std option">
@@ -126,7 +127,7 @@
 <p class="admonition-title">Note</p>
 <p>NOTEBOOK must have one cell with the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> tag. You can add the tag in the cell properties side bar as described <a class="reference external" href="https://papermill.readthedocs.io/en/latest/usage-parameterize.html#jupyterlab-2-0">here</a>. There are several parameter names that are defined by default by the <code class="docutils literal notranslate"><span class="pre">train_model</span></code> tool and that you should use in your code:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">VERBOSITY</span></code>: verbosity level according to keras definition</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VERBOSITY</span></code>: verbosity level according to keras definition (1 for verbose, 2 for more silent)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">N_EPOCHS</span></code>: number of training epochs (set by <code class="docutils literal notranslate"><span class="pre">-n</span></code> parameter)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code>: directory where the model outputs are written</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">LEARNING_RATE</span></code>: learning rate (set by <code class="docutils literal notranslate"><span class="pre">-l</span></code> parameter)</p></li>

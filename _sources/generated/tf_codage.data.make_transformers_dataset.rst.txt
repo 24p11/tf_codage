@@ -1,0 +1,6 @@
+tf\_codage.data.make\_transformers\_dataset
+===========================================
+
+.. currentmodule:: tf_codage.data
+
+.. autofunction:: make_transformers_dataset

@@ -1,0 +1,12 @@
+tf\_codage.models.MaxMaskedPooling
+==================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: MaxMaskedPooling
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

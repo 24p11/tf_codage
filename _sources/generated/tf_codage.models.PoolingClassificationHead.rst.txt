@@ -1,0 +1,12 @@
+tf\_codage.models.PoolingClassificationHead
+===========================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: PoolingClassificationHead
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   
