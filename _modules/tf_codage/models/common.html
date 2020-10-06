@@ -88,7 +88,7 @@
     <span class="sd">&quot;&quot;&quot;Camembert model that can handle long documents by splitting them into separate token batches.</span>
 
 <span class="sd">    The model produces contextualised embeddings and needs to be paired with a task head </span>
-<span class="sd">    (classification etc.)</span>
+<span class="sd">    (for classification etc.) such as ``PoolingClassificationHead``.</span>
 
 <span class="sd">    Creating a new model from scratch (only context embeddings, without task head):</span>
 
@@ -302,15 +302,15 @@
 
         <span class="k">return</span> <span class="n">x</span></div></div>
 
-<span class="k">class</span> <span class="nc">AttentionPooling</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+<div class="viewcode-block" id="AttentionPooling"><a class="viewcode-back" href="../../../generated/tf_codage.models.AttentionPooling.html#tf_codage.models.AttentionPooling">[docs]</a><span class="k">class</span> <span class="nc">AttentionPooling</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pooling using attention mechanism.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="AttentionPooling.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.AttentionPooling.html#tf_codage.models.AttentionPooling.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dense_query</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attention</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Attention</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Attention</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+<div class="viewcode-block" id="AttentionPooling.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.AttentionPooling.html#tf_codage.models.AttentionPooling.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_tokens</span><span class="p">,</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">n_dim</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">*</span> <span class="n">n_splits</span><span class="p">,</span> <span class="n">n_dim</span><span class="p">])</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -319,15 +319,16 @@
             <span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">*</span> <span class="n">n_splits</span><span class="p">])</span>
             <span class="n">mask</span> <span class="o">=</span>  <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)]</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention</span><span class="p">([</span><span class="n">query</span><span class="p">,</span> <span class="n">value</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span><span class="c1">#, use_scale=True)</span>
-        <span class="k">return</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="n">output</span></div></div>
 
 <div class="viewcode-block" id="PoolingClassificationHead"><a class="viewcode-back" href="../../../generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead">[docs]</a><span class="k">class</span> <span class="nc">PoolingClassificationHead</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Classification head with pooling layer.</span>
-
+    <span class="sd">&quot;&quot;&quot;Classification head that pools BERT embeddings.</span>
+<span class="sd">   </span>
 <span class="sd">    The type of pooling can be &#39;mean&#39;, &#39;max&#39; or an instance of</span>
 <span class="sd">    a custom pooling mechanism subclassed from ``Layer``.</span>
 
-<span class="sd">    Adding classification head with maximum pooling to FullTextBert:</span>
+<span class="sd">    This classification head should be combined with a model</span>
+<span class="sd">    calculating cotextualised word embeddings such as ``FullTextBert``:</span>
 
 <span class="sd">      &gt;&gt;&gt; config = FullTextConfig(pool_type=&quot;max&quot;)</span>
 <span class="sd">      &gt;&gt;&gt; cls_token = 6</span>

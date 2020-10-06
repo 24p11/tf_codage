@@ -16,6 +16,9 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
 
 .. currentmodule:: tf_codage
 
+Models
+~~~~~~
+
 .. autosummary::
    :toctree: generated/
    :template: tf_model.rst
@@ -24,9 +27,37 @@ You will find here the documentation of all modules within the ``tf_codage`` pac
    models.FullTextBert
    models.BertForMultilabelClassification
    models.CamembertForMultilabelClassification
+
+Layers
+~~~~~~
+
+Extra layers to extend model functionalities.
+
+.. autosummary::
+   :toctree: generated/
+   :template: tf_model.rst
+   
+   models.PoolingClassificationHead
+
+
+Pooling mechanisms
+~~~~~~~~~~~~~~~~~~
+
+They can be used with :py:class:`models.PoolingClassificationHead`
+
+.. autosummary::
+   :toctree: generated/
+   :template: tf_model.rst
+   
    models.MeanMaskedPooling
    models.MaxMaskedPooling
-   models.PoolingClassificationHead
+   models.AttentionPooling
+
+
+Configuration
+~~~~~~~~~~~~~
+
+Configuration objects with model parameters.
 
 .. autosummary::
    :toctree: generated/

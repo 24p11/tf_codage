@@ -16,8 +16,8 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="tf_codage.models.FullTextConfig" href="tf_codage.models.FullTextConfig.html" />
-    <link rel="prev" title="tf_codage.models.MaxMaskedPooling" href="tf_codage.models.MaxMaskedPooling.html" />
+    <link rel="next" title="tf_codage.models.MeanMaskedPooling" href="tf_codage.models.MeanMaskedPooling.html" />
+    <link rel="prev" title="tf_codage.models.CamembertForMultilabelClassification" href="tf_codage.models.CamembertForMultilabelClassification.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -39,10 +39,11 @@
 <dl class="py class">
 <dt id="tf_codage.models.PoolingClassificationHead">
 <em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.</code><code class="sig-name descname">PoolingClassificationHead</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead" title="Permalink to this definition">¶</a></dt>
-<dd><p>Classification head with pooling layer.</p>
+<dd><p>Classification head that pools BERT embeddings.</p>
 <p>The type of pooling can be ‘mean’, ‘max’ or an instance of
 a custom pooling mechanism subclassed from <code class="docutils literal notranslate"><span class="pre">Layer</span></code>.</p>
-<p>Adding classification head with maximum pooling to FullTextBert:</p>
+<p>This classification head should be combined with a model
+calculating cotextualised word embeddings such as <code class="docutils literal notranslate"><span class="pre">FullTextBert</span></code>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">FullTextConfig</span><span class="p">(</span><span class="n">pool_type</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cls_token</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sep_token</span> <span class="o">=</span> <span class="mi">7</span>
@@ -119,8 +120,8 @@ the config object)</p>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
-      <li>Previous: <a href="tf_codage.models.MaxMaskedPooling.html" title="previous chapter">tf_codage.models.MaxMaskedPooling</a></li>
-      <li>Next: <a href="tf_codage.models.FullTextConfig.html" title="next chapter">tf_codage.models.FullTextConfig</a></li>
+      <li>Previous: <a href="tf_codage.models.CamembertForMultilabelClassification.html" title="previous chapter">tf_codage.models.CamembertForMultilabelClassification</a></li>
+      <li>Next: <a href="tf_codage.models.MeanMaskedPooling.html" title="next chapter">tf_codage.models.MeanMaskedPooling</a></li>
   </ul></li>
   </ul></li>
 </ul>

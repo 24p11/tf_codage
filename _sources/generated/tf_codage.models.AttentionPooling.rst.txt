@@ -1,0 +1,12 @@
+tf\_codage.models.AttentionPooling
+==================================
+
+.. currentmodule:: tf_codage.models
+
+.. autoclass:: AttentionPooling
+
+   .. automethod:: __init__
+
+   .. automethod:: call
+
+   

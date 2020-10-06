@@ -41,7 +41,7 @@
 <em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.</code><code class="sig-name descname">FullTextBert</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Camembert model that can handle long documents by splitting them into separate token batches.</p>
 <p>The model produces contextualised embeddings and needs to be paired with a task head
-(classification etc.)</p>
+(for classification etc.) such as <code class="docutils literal notranslate"><span class="pre">PoolingClassificationHead</span></code>.</p>
 <p>Creating a new model from scratch (only context embeddings, without task head):</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">CamembertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;camembert-base&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">cls_token_id</span>

@@ -45,6 +45,8 @@
 <p>Implement models for various tasks. Most of the models
 are sub-classed of the huggingface transformers models, so please
 checkout their  <a class="reference external" href="https://huggingface.co/transformers/">docs</a> for more information</p>
+<div class="section" id="models">
+<h4>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h4>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -63,17 +65,48 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 <tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.CamembertForMultilabelClassification.html#tf_codage.models.CamembertForMultilabelClassification" title="tf_codage.models.CamembertForMultilabelClassification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.CamembertForMultilabelClassification</span></code></a>(…)</p></td>
 <td><p>Camembert for sequence classification with sigmoid activation in the output layer</p></td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="layers">
+<h4>Layers<a class="headerlink" href="#layers" title="Permalink to this headline">¶</a></h4>
+<p>Extra layers to extend model functionalities.</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead" title="tf_codage.models.PoolingClassificationHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Classification head that pools BERT embeddings.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="pooling-mechanisms">
+<h4>Pooling mechanisms<a class="headerlink" href="#pooling-mechanisms" title="Permalink to this headline">¶</a></h4>
+<p>They can be used with <a class="reference internal" href="generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead" title="tf_codage.models.PoolingClassificationHead"><code class="xref py py-class docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code></a></p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.MeanMaskedPooling.html#tf_codage.models.MeanMaskedPooling" title="tf_codage.models.MeanMaskedPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MeanMaskedPooling</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Mean pooling with strides and mask</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/tf_codage.models.MaxMaskedPooling.html#tf_codage.models.MaxMaskedPooling" title="tf_codage.models.MaxMaskedPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.MaxMaskedPooling</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Max pooling with strides and mask</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead" title="tf_codage.models.PoolingClassificationHead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.PoolingClassificationHead</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Classification head with pooling layer.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/tf_codage.models.AttentionPooling.html#tf_codage.models.AttentionPooling" title="tf_codage.models.AttentionPooling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models.AttentionPooling</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Pooling using attention mechanism.</p></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="configuration">
+<h4>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configuration objects with model parameters.</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -85,6 +118,7 @@ checkout their  <a class="reference external" href="https://huggingface.co/trans
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 <div class="section" id="module-tf_codage.models.transformer">
 <span id="tf-codage-models-transformer-vanilla-transformer-model"></span><h3><a class="reference internal" href="#module-tf_codage.models.transformer" title="tf_codage.models.transformer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models.transformer</span></code></a> – vanilla transformer model<a class="headerlink" href="#module-tf_codage.models.transformer" title="Permalink to this headline">¶</a></h3>
