@@ -267,6 +267,24 @@ class MaxMaskedPooling(tf.keras.layers.Layer):
 
         return x
 
+class AttentionPooling(tf.keras.layers.Layer):
+    """Pooling using attention mechanism."""
+
+    def __init__(self, config, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dense_query = tf.keras.layers.Dense(50)
+        self.attention = tf.keras.layers.Attention()
+
+    def call(self, inputs, mask):
+        n_batch, n_tokens, n_splits, n_dim = inputs.shape
+        value = tf.reshape(inputs, [-1, n_tokens * n_splits, n_dim])
+        x = tf.transpose(value, [0, 2, 1])
+        query = tf.transpose(self.dense_query(x), [0, 2, 1])
+        if mask is not None:
+            mask = tf.reshape(mask, [-1, n_tokens * n_splits])
+            mask =  [None, tf.cast(mask, bool)]
+        output = self.attention([query, value], mask=mask)#, use_scale=True)
+        return output
 
 class PoolingClassificationHead(tf.keras.layers.Layer):
     """Classification head with pooling layer.

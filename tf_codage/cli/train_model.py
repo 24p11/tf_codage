@@ -37,7 +37,10 @@ from stat import S_IREAD, S_IRGRP, S_IROTH
     help="top directory for sub-directories with model artifacts",
 )
 @click.option("--log-path", default="../logs/", help="path to save output notebook")
-@click.option("--output-dir", help="path to save model artifacts (used to configure OUTPUT_DIR in the notebook). Defaults to SAVE_PATH/NOTEBOOK-PARAMETER-VALUE...")
+@click.option(
+    "--output-dir",
+    help="path to save model artifacts (used to configure OUTPUT_DIR in the notebook). Defaults to SAVE_PATH/NOTEBOOK-PARAMETER-VALUE...",
+)
 @click.option(
     "-r",
     "--raw-parameter",
@@ -123,7 +126,7 @@ def main(
 
     # make log dir if does not exist
     os.makedirs(log_path, exist_ok=True)
-    
+
     log_path = Path(log_path)
     if output_dir:
         log_path = str(log_path / Path(output_dir).stem)
