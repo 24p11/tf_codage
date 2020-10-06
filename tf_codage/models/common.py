@@ -102,6 +102,7 @@ class FullTextBert(TFCamembertModel):
         self.sep_token = sep_token
         self.max_batches = max_batches
 
+        # we need to compute new mask and propagate it
         self._compute_output_and_mask_jointly = True
 
     @property
@@ -132,7 +133,7 @@ class FullTextBert(TFCamembertModel):
              ``input_ids``, ``token_type_ids``, ``attention_mask``
 
         Returns:
-           a tuple of contextualised embeddings and mask
+           contextualised embeddings
         """
 
         cls_token = self.cls_token
