@@ -137,6 +137,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sep_token</span> <span class="o">=</span> <span class="n">sep_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_batches</span> <span class="o">=</span> <span class="n">max_batches</span>
 
+        <span class="c1"># we need to compute new mask and propagate it</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_output_and_mask_jointly</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
@@ -167,7 +168,7 @@
 <span class="sd">             ``input_ids``, ``token_type_ids``, ``attention_mask``</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">           a tuple of contextualised embeddings and mask</span>
+<span class="sd">           contextualised embeddings</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">cls_token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls_token</span>
