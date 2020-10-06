@@ -55,7 +55,7 @@ class FullTextBert(TFCamembertModel):
     The model produces contextualised embeddings and needs to be paired with a task head 
     (classification etc.)
 
-    Typical usage example:
+    Creating a new model from scratch (only context embeddings, without task head):
 
       >>> tokenizer = CamembertTokenizer.from_pretrained("camembert-base")
       >>> cls_token = tokenizer.cls_token_id
@@ -65,7 +65,7 @@ class FullTextBert(TFCamembertModel):
       >>> inputs = {
       ...     "input_ids": tf.constant([[1, 2, 3]]),
       ...     "attention_mask": tf.constant([[0, 0, 0]])}
-      >>> embeddings, mask = model(inputs)
+      >>> embeddings = model(inputs)
 
 
     """
@@ -102,7 +102,29 @@ class FullTextBert(TFCamembertModel):
         self.sep_token = sep_token
         self.max_batches = max_batches
 
-    def call(self, inputs, **kwargs):
+        self._compute_output_and_mask_jointly = True
+
+    @property
+    def input_size(self):
+        return self.config.max_position_embeddings - 2
+
+    def pad_mask(self, attention_mask):
+
+        max_batches = self.max_batches
+        input_size = self.input_size
+        bert_seq_len = input_size - 2
+        _, seq_len = attention_mask.shape
+
+        padded_mask = tf.pad(
+            attention_mask,
+            [[0, 0], [0, max_batches * bert_seq_len - seq_len]],
+            constant_values=0,
+        )
+        attention_mask = tf.reshape(padded_mask, [-1, bert_seq_len])
+        attention_mask = tf.pad(attention_mask, [[0, 0], [1, 1]], constant_values=1)
+        return attention_mask
+
+    def call(self, inputs, mask=None, **kwargs):
         """Evalulate the model for inputs.
 
         Args:
@@ -117,7 +139,7 @@ class FullTextBert(TFCamembertModel):
         sep_token = self.sep_token
 
         max_batches = self.max_batches
-        input_size = self.config.max_position_embeddings - 2
+        input_size = self.input_size
         hidden_size = self.config.hidden_size
 
         # take account of special tokens
@@ -125,10 +147,10 @@ class FullTextBert(TFCamembertModel):
 
         if isinstance(inputs, dict):
             input_ids = inputs["input_ids"]
-            attention_mask = inputs.get("attention_mask", None)
+            attention_mask = inputs.get("attention_mask", mask)
         else:
             input_ids = inputs
-            attention_mask = None
+            attention_mask = mask
 
         n_seq, seq_len = input_ids.shape
         padded_inputs = tf.pad(
@@ -145,13 +167,7 @@ class FullTextBert(TFCamembertModel):
         )
 
         if attention_mask is not None:
-            padded_mask = tf.pad(
-                attention_mask,
-                [[0, 0], [0, max_batches * bert_seq_len - seq_len]],
-                constant_values=0,
-            )
-            attention_mask = tf.reshape(padded_mask, [-1, bert_seq_len])
-            attention_mask = tf.pad(attention_mask, [[0, 0], [1, 1]], constant_values=1)
+            attention_mask = self.pad_mask(attention_mask)
 
         outputs = self.roberta(padded_tensor, attention_mask=attention_mask, **kwargs)
 
@@ -164,12 +180,12 @@ class FullTextBert(TFCamembertModel):
             sequence_output, [-1, max_batches, input_size, hidden_size]
         )
 
-        if attention_mask is not None:
-            reshaped_mask = tf.reshape(attention_mask, [-1, max_batches, input_size])
-        else:
-            reshaped_mask = None
+        if attention_mask is not None and self._compute_output_and_mask_jointly:
+            reshaped_outputs._keras_mask = tf.reshape(
+                attention_mask, [-1, max_batches, input_size]
+            )
 
-        return reshaped_outputs, reshaped_mask
+        return reshaped_outputs
 
 
 class BertForMultilabelClassification(TFBertForSequenceClassification):
@@ -257,9 +273,28 @@ class PoolingClassificationHead(tf.keras.layers.Layer):
 
     The type of pooling can be 'mean', 'max' or an instance of
     a custom pooling mechanism subclassed from ``Layer``.
+
+    Adding classification head with maximum pooling to FullTextBert:
+
+      >>> config = FullTextConfig(pool_type="max")
+      >>> cls_token = 6
+      >>> sep_token = 7
+      >>> model = FullTextBert(config, cls_token=cls_token, sep_token=sep_token)
+      >>> head = PoolingClassificationHead(config)
+      >>> classifier = tf.keras.Sequential([model, head])
+      >>> inputs = {
+      ...     "input_ids": tf.constant([[1, 2, 3]]),
+      ...     "attention_mask": tf.constant([[0, 0, 0]])}
+      >>> output_logits = classifier(inputs)
+
     """
 
     def __init__(self, config, *args, **kwargs):
+        """Create an instance of the classification head.
+
+        Args:
+            config: instance of FullTextConfig
+        """
         dropout_rate = config.hidden_dropout_prob
         hidden_size = config.classification_hidden_size
         num_labels = config.num_labels
@@ -280,6 +315,15 @@ class PoolingClassificationHead(tf.keras.layers.Layer):
         self.dense2 = tf.keras.layers.Dense(num_labels, activation="softmax")
 
     def call(self, inputs, mask):
+        """Calculate the class logits from embeddings.
+
+        Args:
+            inputs: input embeddings (tf.Tensor)
+
+        Returns:
+            logits for each class (number of classes is configured by
+            the config object)
+        """
         x = self.pooling(inputs, mask)
         x = self.flatten(x)
         x = self.norm1(x)

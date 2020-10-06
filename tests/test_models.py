@@ -17,9 +17,9 @@ def test_full_text_bert_layer_id():
      [7, 2, 1, 1, 1],
      [0, 1, 0, 3, 3]])
     
-    outputs, mask = model(input_ids)
+    outputs = model(input_ids)
     assert outputs.shape == (3, 10, 512, 768)
-    assert mask is None
+    assert outputs._keras_mask is None
     
 def test_full_text_bert():
     
@@ -32,17 +32,17 @@ def test_full_text_bert():
      [7, 2, 1, 1, 1],
      [0, 1, 0, 3, 3]])
     
-    outputs, mask = model(input_ids)
+    outputs = model(input_ids)
     assert outputs.shape == (3, 10, 512, 768)
-    assert mask is None
+    assert outputs._keras_mask is None
     
     # test with dict input
-    outputs_dict, _ = model({'input_ids': input_ids})
+    outputs_dict = model({'input_ids': input_ids})
     assert outputs_dict.shape == (3, 10, 512, 768)
     assert (outputs_dict.numpy() == outputs.numpy()).all()
     
     # test with attention mask
-    outputs_attention, _ = model({'input_ids': input_ids,
+    outputs_attention = model({'input_ids': input_ids,
                               'attention_mask': tf.ones((3, 5), tf.int32)})
     assert outputs.shape == (3, 10, 512, 768)
     # because of the padding
@@ -60,11 +60,11 @@ def test_full_text_bert_attention_mask():
     attention_mask2b = tf.constant([[1, 1, 1, 1, 0]])
     
     
-    out1, mask1 = model({'input_ids': input1,
+    out1 = model({'input_ids': input1,
                   'attention_mask': attention_mask1})
-    out2a, mask2a = model({'input_ids': input2,
+    out2a = model({'input_ids': input2,
                   'attention_mask': attention_mask2a})
-    out2b, mask2b = model({'input_ids': input2,
+    out2b = model({'input_ids': input2,
                   'attention_mask': attention_mask2b})
     
     
@@ -83,11 +83,11 @@ def test_full_text_bert_attention_mask():
     # special tokens are not masked
     expected_mask[:, :,  0] = 1
     expected_mask[:, :, -1] = 1
-    assert np.equal(mask1.numpy(), expected_mask).all()
-    assert np.equal(mask2b.numpy(), expected_mask).all()
+    assert np.equal(out1._keras_mask.numpy(), expected_mask).all()
+    assert np.equal(out2b._keras_mask.numpy(), expected_mask).all()
     
     expected_mask[0, 0, 5] = 1
-    assert_allclose(mask2a.numpy(), expected_mask)
+    assert_allclose(out2a._keras_mask.numpy(), expected_mask)
 
 
 def test_full_text_bert_compare():
@@ -118,7 +118,7 @@ def test_full_text_bert_compare():
         model_dir, cls_token=cls_token, sep_token=sep_token, max_batches=max_batches) 
     
     
-    out_full_bert, _ = fulltext_model(np.array(multi_token))
+    out_full_bert = fulltext_model(np.array(multi_token))
     
     assert_allclose(out_bert, out_full_bert.numpy(), atol=1e-4)
 
