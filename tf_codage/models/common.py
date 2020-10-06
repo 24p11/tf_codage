@@ -53,7 +53,7 @@ class FullTextBert(TFCamembertModel):
     """Camembert model that can handle long documents by splitting them into separate token batches.
 
     The model produces contextualised embeddings and needs to be paired with a task head 
-    (classification etc.)
+    (for classification etc.) such as ``PoolingClassificationHead``.
 
     Creating a new model from scratch (only context embeddings, without task head):
 
@@ -287,12 +287,13 @@ class AttentionPooling(tf.keras.layers.Layer):
         return output
 
 class PoolingClassificationHead(tf.keras.layers.Layer):
-    """Classification head with pooling layer.
-
+    """Classification head that pools BERT embeddings.
+   
     The type of pooling can be 'mean', 'max' or an instance of
     a custom pooling mechanism subclassed from ``Layer``.
 
-    Adding classification head with maximum pooling to FullTextBert:
+    This classification head should be combined with a model
+    calculating cotextualised word embeddings such as ``FullTextBert``:
 
       >>> config = FullTextConfig(pool_type="max")
       >>> cls_token = 6
