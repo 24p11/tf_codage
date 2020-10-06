@@ -42,7 +42,7 @@
 <dd><p>Camembert model that can handle long documents by splitting them into separate token batches.</p>
 <p>The model produces contextualised embeddings and needs to be paired with a task head
 (classification etc.)</p>
-<p>Typical usage example:</p>
+<p>Creating a new model from scratch (only context embeddings, without task head):</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">CamembertTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;camembert-base&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cls_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">cls_token_id</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sep_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">sep_token_id</span>
@@ -51,7 +51,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]),</span>
 <span class="gp">... </span>    <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">embeddings</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -74,7 +74,7 @@ layer_id=-1 (the default) is the last layer</p></li>
 
 <dl class="py method">
 <dt id="tf_codage.models.FullTextBert.call">
-<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert.call" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">mask</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#FullTextBert.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.FullTextBert.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evalulate the model for inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

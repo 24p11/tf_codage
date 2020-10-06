@@ -42,28 +42,41 @@
 <dd><p>Classification head with pooling layer.</p>
 <p>The type of pooling can be ‘mean’, ‘max’ or an instance of
 a custom pooling mechanism subclassed from <code class="docutils literal notranslate"><span class="pre">Layer</span></code>.</p>
+<p>Adding classification head with maximum pooling to FullTextBert:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">FullTextConfig</span><span class="p">(</span><span class="n">pool_type</span><span class="o">=</span><span class="s2">&quot;max&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cls_token</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sep_token</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">FullTextBert</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">cls_token</span><span class="o">=</span><span class="n">cls_token</span><span class="p">,</span> <span class="n">sep_token</span><span class="o">=</span><span class="n">sep_token</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">head</span> <span class="o">=</span> <span class="n">PoolingClassificationHead</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">classifier</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Sequential</span><span class="p">([</span><span class="n">model</span><span class="p">,</span> <span class="n">head</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]),</span>
+<span class="gp">... </span>    <span class="s2">&quot;attention_mask&quot;</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">output_logits</span> <span class="o">=</span> <span class="n">classifier</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt id="tf_codage.models.PoolingClassificationHead.__init__">
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create an instance of the classification head.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> – instance of FullTextConfig</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt id="tf_codage.models.PoolingClassificationHead.call">
 <code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/common.html#PoolingClassificationHead.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.PoolingClassificationHead.call" title="Permalink to this definition">¶</a></dt>
-<dd><p>This is where the layer’s logic lives.</p>
-<p>Note here that <cite>call()</cite> method in <cite>tf.keras</cite> is little bit different
-from <cite>keras</cite> API. In <cite>keras</cite> API, you can pass support masking for
-layers as additional arguments. Whereas <cite>tf.keras</cite> has <cite>compute_mask()</cite>
-method to support masking.</p>
+<dd><p>Calculate the class logits from embeddings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> – Input tensor, or list/tuple of input tensors.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments. Currently unused.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>inputs</strong> – input embeddings (tf.Tensor)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A tensor or list/tuple of tensors.</p>
+<dd class="field-even"><p>logits for each class (number of classes is configured by
+the config object)</p>
 </dd>
 </dl>
 </dd></dl>
