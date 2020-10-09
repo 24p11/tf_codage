@@ -41,8 +41,12 @@
 <h2>Sandboxing<a class="headerlink" href="#sandboxing" title="Permalink to this headline">¶</a></h2>
 <p>We recommend installing the library in a sandboxed environment, such as <cite>conda</cite> or <cite>venv</cite>.</p>
 <p>To create a new environment with <cite>conda</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda env create -n tf_codage_dev
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n tf_codage_dev
 $ conda activate tf_codage_dev
+</pre></div>
+</div>
+<p>To add this environment to the list of Jupyter kernels in the list of JupyterLab interface:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install ipykernel
 $ python -m ipykernel install --user --name tf_codage_dev
 </pre></div>
 </div>
@@ -53,7 +57,7 @@ environment.</p>
 <div class="section" id="installing">
 <h2>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h2>
 <p>You can install this library using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git https://github.com/24p11/automate_pmsi.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/24p11/automate_pmsi.git
 $ cd automate_pmsi
 $ pip install -e .
 </pre></div>
@@ -75,7 +79,7 @@ $ pip install -e .
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
 <p>The tests are located in the <code class="docutils literal notranslate"><span class="pre">tests</span></code> sub-directory. To run them, you can use <code class="docutils literal notranslate"><span class="pre">pytest</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install pytest
-$ pytest tests
+$ pytest
 </pre></div>
 </div>
 </div>

@@ -12,8 +12,12 @@ We recommend installing the library in a sandboxed environment, such as `conda` 
 
 To create a new environment with `conda`::
 
-    $ conda env create -n tf_codage_dev
+    $ conda create -n tf_codage_dev
     $ conda activate tf_codage_dev
+
+To add this environment to the list of Jupyter kernels in the list of JupyterLab interface::
+
+    $ conda install ipykernel
     $ python -m ipykernel install --user --name tf_codage_dev
 
 The last step is required if you want to use ``tf_codage`` from Jupyter notebook.
@@ -25,7 +29,7 @@ Installing
 
 You can install this library using ``pip``::
 
-    $ git https://github.com/24p11/automate_pmsi.git
+    $ git clone https://github.com/24p11/automate_pmsi.git
     $ cd automate_pmsi
     $ pip install -e .
 
@@ -48,4 +52,4 @@ Testing
 The tests are located in the ``tests`` sub-directory. To run them, you can use ``pytest``::
 
     $ pip install pytest
-    $ pytest tests
+    $ pytest 
