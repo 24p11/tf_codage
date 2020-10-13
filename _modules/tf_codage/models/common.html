@@ -303,6 +303,7 @@
 
         <span class="k">return</span> <span class="n">x</span></div></div>
 
+
 <div class="viewcode-block" id="AttentionPooling"><a class="viewcode-back" href="../../../generated/tf_codage.models.AttentionPooling.html#tf_codage.models.AttentionPooling">[docs]</a><span class="k">class</span> <span class="nc">AttentionPooling</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pooling using attention mechanism.&quot;&quot;&quot;</span>
 
@@ -318,9 +319,10 @@
         <span class="n">query</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dense_query</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_tokens</span> <span class="o">*</span> <span class="n">n_splits</span><span class="p">])</span>
-            <span class="n">mask</span> <span class="o">=</span>  <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention</span><span class="p">([</span><span class="n">query</span><span class="p">,</span> <span class="n">value</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span><span class="c1">#, use_scale=True)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention</span><span class="p">([</span><span class="n">query</span><span class="p">,</span> <span class="n">value</span><span class="p">],</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>  <span class="c1"># , use_scale=True)</span>
         <span class="k">return</span> <span class="n">output</span></div></div>
+
 
 <div class="viewcode-block" id="PoolingClassificationHead"><a class="viewcode-back" href="../../../generated/tf_codage.models.PoolingClassificationHead.html#tf_codage.models.PoolingClassificationHead">[docs]</a><span class="k">class</span> <span class="nc">PoolingClassificationHead</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Classification head that pools BERT embeddings.</span>

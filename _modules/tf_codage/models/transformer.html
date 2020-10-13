@@ -44,6 +44,9 @@
 <span class="sd">.. _Attention is all you need: https://arxiv.org/pdf/1706.03762.pdf</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">asdict</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
@@ -388,64 +391,47 @@
 <div class="viewcode-block" id="Transformer"><a class="viewcode-back" href="../../../generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer">[docs]</a><span class="k">class</span> <span class="nc">Transformer</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Complete transformer model&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Transformer.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">num_layers</span><span class="p">,</span>
-        <span class="n">d_model</span><span class="p">,</span>
-        <span class="n">num_heads</span><span class="p">,</span>
-        <span class="n">dff</span><span class="p">,</span>
-        <span class="n">target_vocab_size</span><span class="p">,</span>
-        <span class="n">pe_input</span><span class="p">,</span>
-        <span class="n">pe_target</span><span class="p">,</span>
-        <span class="n">rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">decoder_pad_token_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">input_vocab_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+<div class="viewcode-block" id="Transformer.__init__"><a class="viewcode-back" href="../../../generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Creates a new transformer.</span>
 
 <span class="sd">        Creates a complete encoder-decoder architecture for transformer.</span>
 <span class="sd">        It can accept both the embeddings or learn the embeddings on its</span>
 <span class="sd">        own.</span>
-
+<span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            num_layer: number of layers</span>
-<span class="sd">            d_model: size of embedding vector and hidden layers</span>
-<span class="sd">            num_heads:  number of attention heads</span>
-<span class="sd">            dff:  number of units in feedforward sublayers</span>
-<span class="sd">            target_vocab_size: number of symbols in target dictionary</span>
-<span class="sd">            pe_input: number of position embeddings (tokens) in the encoder input</span>
-<span class="sd">            pe_target: number of position embeddings in the decoder output</span>
-<span class="sd">            rate: dropout rate</span>
-<span class="sd">            decoder_pad_token_id: token number used for padding decoder inputs</span>
-<span class="sd">            input_vocab_size: size of input vocabulary</span>
-<span class="sd">              if input_vocab_size = None the inputs have to be already embeddings</span>
-<span class="sd">              (as `input_embeds` key in input dictionary).</span>
+<span class="sd">            config: model parameters as a TransformerConfig object</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            an instance of transformer model.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Transformer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_pad_token_id</span> <span class="o">=</span> <span class="n">decoder_pad_token_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_pad_token_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">decoder_pad_token_id</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span>
-            <span class="n">num_layers</span><span class="p">,</span>
-            <span class="n">d_model</span><span class="p">,</span>
-            <span class="n">num_heads</span><span class="p">,</span>
-            <span class="n">dff</span><span class="p">,</span>
-            <span class="n">pe_input</span><span class="p">,</span>
-            <span class="n">rate</span><span class="p">,</span>
-            <span class="n">input_vocab_size</span><span class="o">=</span><span class="n">input_vocab_size</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">num_layers</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">dff</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">pe_input</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span>
+            <span class="n">input_vocab_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">input_vocab_size</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># flag to check if user will pass embeddings or token ids</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_token_inputs</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">input_vocab_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_token_inputs</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">input_vocab_size</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span>
-            <span class="n">num_layers</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">num_heads</span><span class="p">,</span> <span class="n">dff</span><span class="p">,</span> <span class="n">target_vocab_size</span><span class="p">,</span> <span class="n">pe_target</span><span class="p">,</span> <span class="n">rate</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">num_layers</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">num_heads</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">dff</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">target_vocab_size</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">pe_target</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">rate</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">final_layer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">target_vocab_size</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_layer</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">target_vocab_size</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Transformer.call"><a class="viewcode-back" href="../../../generated/tf_codage.models.transformer.Transformer.html#tf_codage.models.transformer.Transformer.call">[docs]</a>    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -487,6 +473,55 @@
         <span class="p">)</span>  <span class="c1"># (batch_size, tar_seq_len, target_vocab_size)</span>
 
         <span class="k">return</span> <span class="n">final_output</span></div></div>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TransformerConfig</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Common parameters for transformer model (Transformer class):</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        num_layer: number of layers</span>
+<span class="sd">        d_model: size of embedding vector and hidden layers</span>
+<span class="sd">        num_heads:  number of attention heads</span>
+<span class="sd">        dff:  number of units in feedforward sublayers</span>
+<span class="sd">        target_vocab_size: number of symbols in target dictionary</span>
+<span class="sd">        pe_input: number of position embeddings (tokens) in the encoder input</span>
+<span class="sd">        pe_target: number of position embeddings in the decoder output</span>
+<span class="sd">        rate: dropout rate</span>
+<span class="sd">        decoder_pad_token_id: token number used for padding decoder inputs</span>
+<span class="sd">        input_vocab_size: size of input vocabulary</span>
+<span class="sd">          if input_vocab_size = None the inputs have to be already embeddings</span>
+<span class="sd">          (as `input_embeds` key in input dictionary).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">d_model</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">dff</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">target_vocab_size</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">pe_input</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">pe_target</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">rate</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">decoder_pad_token_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">input_vocab_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_pad_token_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder_pad_token_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">as_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;wt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fid</span><span class="p">:</span>
+            <span class="n">fid</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_json</span><span class="p">())</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fid</span><span class="p">:</span>
+            <span class="n">restored_params</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">restored_params</span><span class="p">)</span>
 </pre></div>
 
           </div>
