@@ -17,12 +17,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'tf_codage'
-copyright = '2020, Bartosz Telenczuk, Rémi Flicoteaux'
-author = 'Bartosz Telenczuk, Rémi Flicoteaux'
+project = "tf_codage"
+copyright = "2020, Bartosz Telenczuk, Rémi Flicoteaux"
+author = "Bartosz Telenczuk, Rémi Flicoteaux"
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = "0.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,14 +33,14 @@ release = '0.1'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx_click.ext", # to docuument click-based CLI utils
-    "sphinxcontrib.autoprogram", # to document command line utils
-    "sphinx.ext.viewcode", # to show links to source code
+    "sphinx_click.ext",  # to docuument click-based CLI utils
+    "sphinxcontrib.autoprogram",  # to document command line utils
+    "sphinx.ext.viewcode",  # to show links to source code
     "sphinx.ext.napoleon",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -52,15 +52,15 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = "alabaster"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 html_css_files = [
-    'css/css-style.css',
+    "css/css-style.css",
 ]
 
 autosummary_generate = True

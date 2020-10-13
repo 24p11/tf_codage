@@ -362,6 +362,23 @@ class Transformer(tf.keras.Model):
         Creates a complete encoder-decoder architecture for transformer.
         It can accept both the embeddings or learn the embeddings on its
         own.
+
+          >>> n_tokens = 5
+          >>> vocab_size = 10
+          >>> pad_token_id = 0
+          >>> config = TransformerConfig(
+          ...     pe_input=n_tokens,
+          ...     pe_target=n_tokens,
+          ...     decoder_pad_token_id=pad_token_id,
+          ...     target_vocab_size=vocab_size,
+          ...     input_vocab_size=vocab_size)
+          >>> transformer = Transformer(config)
+          >>> transformer({
+          ...     "input_ids": np.array([[2, 3, 4]]),
+          ...     "attention_mask": np.array([[0, 0, 1]]),
+          ...     "codes": np.array([[1, pad_token_id, pad_token_id]]),
+          ... }, training=False)
+          <tf.Tensor: shape=(1, 3, 10), dtype=float32, numpy=...>
         
         Args:
             config: model parameters as a TransformerConfig object
@@ -458,32 +475,48 @@ class TransformerConfig:
           if input_vocab_size = None the inputs have to be already embeddings
           (as `input_embeds` key in input dictionary).
 
+    Default parameters are taken from base transformer model of the paper:
+
+    Vaswani et al. "Attention is all you need", arXiv: 1706.03762, https://arxiv.org/pdf/1706.03762.pdf
     """
 
-    num_layers: int
-    d_model: int
-    num_heads: int
-    dff: int
-    target_vocab_size: int
-    pe_input: int
-    pe_target: int
-    rate: float
+    num_layers: int = 6
+    d_model: int = 512
+    num_heads: int = 8
+    dff: int = 2048
+
+    # these values need to be overridden
+    target_vocab_size: int = 0
+    pe_input: int = 0
+    pe_target: int = 0
+
+    rate: float = 0.1
     decoder_pad_token_id: Optional[int] = None
     input_vocab_size: Optional[int] = None
 
     def __post_init__(self):
         self.num_layers = int(self.num_layers)
-        self.decoder_pad_token_id = int(self.decoder_pad_token_id)
+        if self.decoder_pad_token_id:
+            self.decoder_pad_token_id = int(self.decoder_pad_token_id)
 
     def as_json(self):
+        """dump the configuration to json string"""
         return json.dumps(asdict(self), sort_keys=True, indent=4)
 
     def save(self, file_path):
+        """save the model in a json file"""
         with open(file_path, "wt") as fid:
             fid.write(self.as_json())
 
     @classmethod
     def load(cls, file_path):
+        """load the model from a json file:
+
+        Args:
+            file_path: path to the file
+
+        Returns: config object
+        """
         with open(file_path, "rt") as fid:
             restored_params = json.load(fid)
         return cls(**restored_params)
