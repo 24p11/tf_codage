@@ -1,0 +1,52 @@
+tf\_codage.models.transformer.TransformerConfig
+===============================================
+
+.. currentmodule:: tf_codage.models.transformer
+
+.. autoclass:: TransformerConfig
+
+   
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransformerConfig.__init__
+      ~TransformerConfig.as_json
+      ~TransformerConfig.load
+      ~TransformerConfig.save
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransformerConfig.d_model
+      ~TransformerConfig.decoder_pad_token_id
+      ~TransformerConfig.dff
+      ~TransformerConfig.input_vocab_size
+      ~TransformerConfig.num_heads
+      ~TransformerConfig.num_layers
+      ~TransformerConfig.pe_input
+      ~TransformerConfig.pe_target
+      ~TransformerConfig.rate
+      ~TransformerConfig.target_vocab_size
+   
+
+   .. rubric:: Details
+
+   
+
+   .. automethod:: __init__
+
+   .. automethod:: as_json
+
+   .. automethod:: load
+
+   .. automethod:: save
+
+   

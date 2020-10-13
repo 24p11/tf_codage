@@ -61,6 +61,7 @@ Configuration objects with model parameters.
 
 .. autosummary::
    :toctree: generated/
+   :template: cls.rst
 
    models.FullTextConfig
  
@@ -71,13 +72,34 @@ Configuration objects with model parameters.
 
 .. currentmodule:: tf_codage.models.transformer
 
+Models
+~~~~~~
+
+.. autosummary::
+   :toctree: generated/
+   :template: tf_model.rst
+
+   Transformer
+
+Layers
+~~~~~~
+
 .. autosummary::
    :toctree: generated/
    :template: tf_model.rst
 
    Encoder
    Decoder
-   Transformer
+
+Configuration
+~~~~~~~~~~~~~
+
+.. autosummary::
+   :toctree: generated/
+   :template: cls.rst
+
+   TransformerConfig
+
 
 
 :mod:`tf_codage.data` -- parsing and formatting data

@@ -16,7 +16,7 @@
     <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="tf_codage.models.transformer.Transformer" href="tf_codage.models.transformer.Transformer.html" />
+    <link rel="next" title="tf_codage.models.transformer.TransformerConfig" href="tf_codage.models.transformer.TransformerConfig.html" />
     <link rel="prev" title="tf_codage.models.transformer.Encoder" href="tf_codage.models.transformer.Encoder.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -63,15 +63,11 @@
 <dt id="tf_codage.models.transformer.Decoder.call">
 <code class="sig-name descname">call</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">enc_output</span></em>, <em class="sig-param"><span class="n">training</span></em>, <em class="sig-param"><span class="n">look_ahead_mask</span></em>, <em class="sig-param"><span class="n">padding_mask</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#Decoder.call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.Decoder.call" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is where the layer’s logic lives.</p>
-<p>Note here that <cite>call()</cite> method in <cite>tf.keras</cite> is little bit different
-from <cite>keras</cite> API. In <cite>keras</cite> API, you can pass support masking for
-layers as additional arguments. Whereas <cite>tf.keras</cite> has <cite>compute_mask()</cite>
-method to support masking.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>inputs</strong> – Input tensor, or list/tuple of input tensors.</p></li>
-<li><p><strong>**kwargs</strong> – Additional keyword arguments. Currently unused.</p></li>
+<li><p><strong>**kwargs</strong> – Additional keyword arguments.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -119,7 +115,7 @@ method to support masking.</p>
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
       <li>Previous: <a href="tf_codage.models.transformer.Encoder.html" title="previous chapter">tf_codage.models.transformer.Encoder</a></li>
-      <li>Next: <a href="tf_codage.models.transformer.Transformer.html" title="next chapter">tf_codage.models.transformer.Transformer</a></li>
+      <li>Next: <a href="tf_codage.models.transformer.TransformerConfig.html" title="next chapter">tf_codage.models.transformer.TransformerConfig</a></li>
   </ul></li>
   </ul></li>
 </ul>

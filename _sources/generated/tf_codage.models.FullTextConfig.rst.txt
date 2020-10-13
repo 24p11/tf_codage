@@ -6,7 +6,6 @@ tf\_codage.models.FullTextConfig
 .. autoclass:: FullTextConfig
 
    
-   .. automethod:: __init__
 
    
    .. rubric:: Methods
@@ -17,13 +16,10 @@ tf\_codage.models.FullTextConfig
       ~FullTextConfig.from_dict
       ~FullTextConfig.from_json_file
       ~FullTextConfig.from_pretrained
-      ~FullTextConfig.get_config_dict
       ~FullTextConfig.save_pretrained
       ~FullTextConfig.to_dict
-      ~FullTextConfig.to_diff_dict
       ~FullTextConfig.to_json_file
       ~FullTextConfig.to_json_string
-      ~FullTextConfig.update
    
    
 
@@ -34,7 +30,27 @@ tf\_codage.models.FullTextConfig
    .. autosummary::
    
       ~FullTextConfig.model_type
-      ~FullTextConfig.num_labels
-      ~FullTextConfig.use_return_dict
+      ~FullTextConfig.pretrained_config_archive_map
    
+
+   .. rubric:: Details
+
+   
+
+   .. automethod:: __init__
+
+   .. automethod:: from_dict
+
+   .. automethod:: from_json_file
+
+   .. automethod:: from_pretrained
+
+   .. automethod:: save_pretrained
+
+   .. automethod:: to_dict
+
+   .. automethod:: to_json_file
+
+   .. automethod:: to_json_string
+
    

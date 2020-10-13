@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tf_codage.models.transformer.TransformerConfig &#8212; tf_codage 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/css-style.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tf_codage.data.make_transformers_dataset" href="tf_codage.data.make_transformers_dataset.html" />
+    <link rel="prev" title="tf_codage.models.transformer.Decoder" href="tf_codage.models.transformer.Decoder.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tf-codage-models-transformer-transformerconfig">
+<h1>tf_codage.models.transformer.TransformerConfig<a class="headerlink" href="#tf-codage-models-transformer-transformerconfig" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="tf_codage.models.transformer.TransformerConfig">
+<em class="property">class </em><code class="sig-prename descclassname">tf_codage.models.transformer.</code><code class="sig-name descname">TransformerConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_layers</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6</span></em>, <em class="sig-param"><span class="n">d_model</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">512</span></em>, <em class="sig-param"><span class="n">num_heads</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">8</span></em>, <em class="sig-param"><span class="n">dff</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2048</span></em>, <em class="sig-param"><span class="n">target_vocab_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pe_input</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pe_target</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">decoder_pad_token_id</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_vocab_size</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#TransformerConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.TransformerConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common parameters for transformer model (Transformer class):</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_layer</strong> – number of layers</p></li>
+<li><p><strong>d_model</strong> – size of embedding vector and hidden layers</p></li>
+<li><p><strong>num_heads</strong> – number of attention heads</p></li>
+<li><p><strong>dff</strong> – number of units in feedforward sublayers</p></li>
+<li><p><strong>target_vocab_size</strong> – number of symbols in target dictionary</p></li>
+<li><p><strong>pe_input</strong> – number of position embeddings (tokens) in the encoder input</p></li>
+<li><p><strong>pe_target</strong> – number of position embeddings in the decoder output</p></li>
+<li><p><strong>rate</strong> – dropout rate</p></li>
+<li><p><strong>decoder_pad_token_id</strong> – token number used for padding decoder inputs</p></li>
+<li><p><strong>input_vocab_size</strong> – size of input vocabulary
+if input_vocab_size = None the inputs have to be already embeddings
+(as <cite>input_embeds</cite> key in input dictionary).</p></li>
+</ul>
+</dd>
+</dl>
+<p>Default parameters are taken from base transformer model of the paper:</p>
+<p>Vaswani et al. “Attention is all you need”, arXiv: 1706.03762, <a class="reference external" href="https://arxiv.org/pdf/1706.03762.pdf">https://arxiv.org/pdf/1706.03762.pdf</a></p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tf_codage.models.transformer.TransformerConfig.__init__" title="tf_codage.models.transformer.TransformerConfig.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([num_layers, d_model, num_heads, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tf_codage.models.transformer.TransformerConfig.as_json" title="tf_codage.models.transformer.TransformerConfig.as_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_json</span></code></a>()</p></td>
+<td><p>dump the configuration to json string</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#tf_codage.models.transformer.TransformerConfig.load" title="tf_codage.models.transformer.TransformerConfig.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(file_path)</p></td>
+<td><p>load the model from a json file:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#tf_codage.models.transformer.TransformerConfig.save" title="tf_codage.models.transformer.TransformerConfig.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(file_path)</p></td>
+<td><p>save the model in a json file</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">d_model</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">decoder_pad_token_id</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dff</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">input_vocab_size</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_heads</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_layers</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pe_input</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pe_target</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">rate</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">target_vocab_size</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Details</p>
+<dl class="py method">
+<dt id="tf_codage.models.transformer.TransformerConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_layers</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">6</span></em>, <em class="sig-param"><span class="n">d_model</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">512</span></em>, <em class="sig-param"><span class="n">num_heads</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">8</span></em>, <em class="sig-param"><span class="n">dff</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2048</span></em>, <em class="sig-param"><span class="n">target_vocab_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pe_input</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">pe_target</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">decoder_pad_token_id</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">input_vocab_size</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#tf_codage.models.transformer.TransformerConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf_codage.models.transformer.TransformerConfig.as_json">
+<code class="sig-name descname">as_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#TransformerConfig.as_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.TransformerConfig.as_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>dump the configuration to json string</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf_codage.models.transformer.TransformerConfig.load">
+<em class="property">classmethod </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#TransformerConfig.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.TransformerConfig.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>load the model from a json file:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file_path</strong> – path to the file</p>
+</dd>
+</dl>
+<p>Returns: config object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="tf_codage.models.transformer.TransformerConfig.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tf_codage/models/transformer.html#TransformerConfig.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tf_codage.models.transformer.TransformerConfig.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>save the model in a json file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">tf_codage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command line tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#module-tf_codage.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.models</span></code> - base deep learning models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.data"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.data</span></code> – parsing and formatting data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#module-tf_codage.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">tf_codage.utils</span></code> - common utilities</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html"><code class="docutils literal notranslate"><span class="pre">tf_codage</span></code> API</a><ul>
+      <li>Previous: <a href="tf_codage.models.transformer.Decoder.html" title="previous chapter">tf_codage.models.transformer.Decoder</a></li>
+      <li>Next: <a href="tf_codage.data.make_transformers_dataset.html" title="next chapter">tf_codage.data.make_transformers_dataset</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bartosz Telenczuk, Rémi Flicoteaux.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/tf_codage.models.transformer.TransformerConfig.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
