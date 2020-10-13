@@ -9,6 +9,9 @@ Adapted from tensorflow `tutorial`_.
 .. _Attention is all you need: https://arxiv.org/pdf/1706.03762.pdf
 """
 
+from dataclasses import dataclass, asdict
+import json
+from typing import Optional
 import numpy as np
 import tensorflow as tf
 
@@ -353,64 +356,47 @@ class Decoder(tf.keras.layers.Layer):
 class Transformer(tf.keras.Model):
     """Complete transformer model"""
 
-    def __init__(
-        self,
-        num_layers,
-        d_model,
-        num_heads,
-        dff,
-        target_vocab_size,
-        pe_input,
-        pe_target,
-        rate=0.1,
-        decoder_pad_token_id=None,
-        input_vocab_size=None,
-    ):
+    def __init__(self, config):
         """Creates a new transformer.
 
         Creates a complete encoder-decoder architecture for transformer.
         It can accept both the embeddings or learn the embeddings on its
         own.
-
+        
         Args:
-            num_layer: number of layers
-            d_model: size of embedding vector and hidden layers
-            num_heads:  number of attention heads
-            dff:  number of units in feedforward sublayers
-            target_vocab_size: number of symbols in target dictionary
-            pe_input: number of position embeddings (tokens) in the encoder input
-            pe_target: number of position embeddings in the decoder output
-            rate: dropout rate
-            decoder_pad_token_id: token number used for padding decoder inputs
-            input_vocab_size: size of input vocabulary
-              if input_vocab_size = None the inputs have to be already embeddings
-              (as `input_embeds` key in input dictionary).
+            config: model parameters as a TransformerConfig object
 
         Returns:
             an instance of transformer model.
 
         """
         super(Transformer, self).__init__()
-        self.decoder_pad_token_id = decoder_pad_token_id
+        self.decoder_pad_token_id = config.decoder_pad_token_id
 
         self.encoder = Encoder(
-            num_layers,
-            d_model,
-            num_heads,
-            dff,
-            pe_input,
-            rate,
-            input_vocab_size=input_vocab_size,
+            config.num_layers,
+            config.d_model,
+            config.num_heads,
+            config.dff,
+            config.pe_input,
+            config.rate,
+            input_vocab_size=config.input_vocab_size,
         )
 
         # flag to check if user will pass embeddings or token ids
-        self._token_inputs = bool(input_vocab_size)
+        self._token_inputs = bool(config.input_vocab_size)
 
         self.decoder = Decoder(
-            num_layers, d_model, num_heads, dff, target_vocab_size, pe_target, rate
+            config.num_layers,
+            config.d_model,
+            config.num_heads,
+            config.dff,
+            config.target_vocab_size,
+            config.pe_target,
+            config.rate,
         )
 
-        self.final_layer = tf.keras.layers.Dense(target_vocab_size)
+        self.final_layer = tf.keras.layers.Dense(config.target_vocab_size)
 
     def call(self, inputs, training=None):
         """
@@ -452,3 +438,52 @@ class Transformer(tf.keras.Model):
         )  # (batch_size, tar_seq_len, target_vocab_size)
 
         return final_output
+
+
+@dataclass
+class TransformerConfig:
+    """Common parameters for transformer model (Transformer class):
+    
+    Args:
+        num_layer: number of layers
+        d_model: size of embedding vector and hidden layers
+        num_heads:  number of attention heads
+        dff:  number of units in feedforward sublayers
+        target_vocab_size: number of symbols in target dictionary
+        pe_input: number of position embeddings (tokens) in the encoder input
+        pe_target: number of position embeddings in the decoder output
+        rate: dropout rate
+        decoder_pad_token_id: token number used for padding decoder inputs
+        input_vocab_size: size of input vocabulary
+          if input_vocab_size = None the inputs have to be already embeddings
+          (as `input_embeds` key in input dictionary).
+
+    """
+
+    num_layers: int
+    d_model: int
+    num_heads: int
+    dff: int
+    target_vocab_size: int
+    pe_input: int
+    pe_target: int
+    rate: float
+    decoder_pad_token_id: Optional[int] = None
+    input_vocab_size: Optional[int] = None
+
+    def __post_init__(self):
+        self.num_layers = int(self.num_layers)
+        self.decoder_pad_token_id = int(self.decoder_pad_token_id)
+
+    def as_json(self):
+        return json.dumps(asdict(self), sort_keys=True, indent=4)
+
+    def save(self, file_path):
+        with open(file_path, "wt") as fid:
+            fid.write(self.as_json())
+
+    @classmethod
+    def load(cls, file_path):
+        with open(file_path, "rt") as fid:
+            restored_params = json.load(fid)
+        return cls(**restored_params)

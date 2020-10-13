@@ -268,6 +268,7 @@ class MaxMaskedPooling(tf.keras.layers.Layer):
 
         return x
 
+
 class AttentionPooling(tf.keras.layers.Layer):
     """Pooling using attention mechanism."""
 
@@ -283,9 +284,10 @@ class AttentionPooling(tf.keras.layers.Layer):
         query = tf.transpose(self.dense_query(x), [0, 2, 1])
         if mask is not None:
             mask = tf.reshape(mask, [-1, n_tokens * n_splits])
-            mask =  [None, tf.cast(mask, bool)]
-        output = self.attention([query, value], mask=mask)#, use_scale=True)
+            mask = [None, tf.cast(mask, bool)]
+        output = self.attention([query, value], mask=mask)  # , use_scale=True)
         return output
+
 
 class PoolingClassificationHead(tf.keras.layers.Layer):
     """Classification head that pools BERT embeddings.
