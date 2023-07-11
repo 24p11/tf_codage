@@ -449,3 +449,72 @@ def make_transformers_dataset(
         dataset = dataset.batch(batch_size).prefetch(2)
 
     return dataset
+
+
+class MakeDataset :
+
+    def __init__(self,
+                config):
+
+        self.MAX_LEN = config.MAX_LEN
+        self.BATCH_SIZE = config.BATCH_SIZE
+        self.VOCAB_SIZE = config.VOCAB_SIZE
+        self.PATH_DATA = config.PATH_DATA
+        self.DATASET_NAME = config.DATASET_NAME
+        self.COL_NAMES = config.COL_NAMES
+        self.COL_TYPES = config.COL_TYPES
+        self.TEXT_COL = config.TEXT_COL
+        self.COL_SELECTED = config.COL_SELECTED
+
+        self.tokenizers = {}
+
+      
+
+    def def_dataset(self):
+        """
+        Create tensorflow dataset
+        """
+        if self.DATASET_NAME == "" :
+            PATH_DATA = self.PATH_DATA
+      
+        else:
+            PATH_DATA = self.PATH_DATA +'%s.csv' % self.DATASET_NAME
+      
+        TFdataset = tf.data.experimental.make_csv_dataset(
+            PATH_DATA,
+            batch_size=self.BATCH_SIZE,
+            column_names=self.COL_NAMES,
+            column_defaults=self.COL_TYPES,
+            select_columns = self.COL_SELECTED,
+            header=True,
+            shuffle=True,
+            shuffle_buffer_size=20000,
+            sloppy=True,
+            prefetch_buffer_size=1,
+            use_quote_delim=True,
+            field_delim=','
+
+        )
+        
+        return(TFdataset)
+
+    def get_data(self,fn):
+
+        data = self.def_dataset()
+        prep_fn = getattr(self,fn)  
+        data = data.map(prep_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+
+        return data
+
+
+    def preprocess_test(self,features):
+        """
+        Simple preprocessing that return a text entry.
+
+        """
+        txt = features.pop(self.TEXT_COL[0])
+
+        return txt
+
+
+
