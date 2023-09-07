@@ -16,6 +16,7 @@ import csv
 import sys
 from itertools import islice
 
+from .utils import create_padding_mask
 
 def load_into_dataframe(csv_path, shuffle=True, **kwargs):
     """Load and preprocess CSV file"""
@@ -455,7 +456,9 @@ class MakeDataset :
 
     def __init__(self,
                 config):
-
+        
+        self.DATASET_EPOCHS = None
+        
         self.MAX_LEN = config.MAX_LEN
         self.BATCH_SIZE = config.BATCH_SIZE
         self.VOCAB_SIZE = config.VOCAB_SIZE
@@ -464,8 +467,7 @@ class MakeDataset :
         self.COL_NAMES = config.COL_NAMES
         self.COL_TYPES = config.COL_TYPES
         self.TEXT_COL = config.TEXT_COL
-        self.COL_SELECTED = config.COL_SELECTED
-
+        self.COL_SELECTED = config.COL_SELECTED           
         self.tokenizers = {}
 
       
@@ -492,7 +494,8 @@ class MakeDataset :
             sloppy=True,
             prefetch_buffer_size=1,
             use_quote_delim=True,
-            field_delim=','
+            field_delim=',',
+            num_epochs = self.DATASET_EPOCHS
 
         )
         
@@ -515,6 +518,112 @@ class MakeDataset :
         txt = features.pop(self.TEXT_COL[0])
 
         return txt
+    
+    def tranformer_train_preprocessing(self, features):
+        """
+        Preprocessing function for tf_codage transformer model, training mode
+        """
+        tk_input = self.tokenizers["input"]
+        tk_target = self.tokenizers["output"]
 
+        input_lines = features.pop(self.input_feature) 
+        input = tk_input(input_lines)
+        
+        attention_mask = create_padding_mask(input)
+        
+        output_lines = features.pop(self.target_feature)
+        target_input = tk_target("[START] " + output_lines )
+        target_labels = tk_target( output_lines + " [END]" )
+
+        return ({"input_ids": input, "attention_mask": attention_mask, "codes" :target_input},target_labels)
+    
+    def tranformer_eval_preprocessing(self, features):
+        """
+        Preprocessing function for tf_codage transformer model, evaluation mode :
+        Preparation for data writing in the log file with : input text, output text, labels
+        """
+        tk_input = self.tokenizers["input"]
+        tk_target = self.tokenizers["output"]
+
+        input_lines = features.pop(self.input_feature) 
+        input = tk_input(input_lines)
+        
+        attention_mask = create_padding_mask(input)
+        output_lines = features.pop(self.target_feature)
+        
+        target_labels = tk_target( output_lines + " [END]" )
+
+        return ( {"input_ids": input, "attention_mask": attention_mask}, target_labels, input_lines, output_lines )
+
+    def generative_tranformer_train_preprocessing(self, features):
+        """
+        Preprocessing function for tf_codage transformer model, training mode
+        Second experiment
+        """
+        tk_input = self.tokenizers["input"]
+        tk_target = self.tokenizers["output"]
+    
+        input_lines = features.pop(self.input_feature) + " [CODE] "
+        input = tk_input(input_lines)
+        
+        attention_mask = create_padding_mask(input)
+    
+        output_lines =  input_lines + features.pop(self.target_feature)
+        target_input = tk_target("[START] " + output_lines)
+        target_labels = tk_target(output_lines + " [END]")
+        
+        return ({"input_ids": input, "attention_mask": attention_mask, "codes" :target_input},
+                target_labels)
+    
+    def generative_tranformer_eval_preprocessing(self, features):
+        """
+        Preprocessing function for tf_codage transformer model, evaluation mode :
+        Preparation for data writing in the log file with : input text, output text, labels
+        Second experiment
+        """
+        tk_input = self.tokenizers["input"]
+        tk_target = self.tokenizers["output"]
+    
+        input_lines = features.pop(self.input_feature) + " [CODE] "
+        input = tk_input(input_lines)
+        
+        attention_mask = create_padding_mask(input)
+    
+        output_lines =  input_lines + features.pop(self.target_feature)
+        target_input = tk_target("[START] " + output_lines)
+        target_labels = tk_target(output_lines + " [END]")
+    
+        return ({"input_ids": input, "attention_mask": attention_mask},
+                target_labels,
+                input_lines,
+                output_lines)
+    
+    def Keras_tranformer_train_preprocessing(self,features):
+      """
+      Preprocessing function for tf_codage keras_transformer model, training mode
+      """
+      tk_input = self.tokenizers["input"]
+      tk_target =  self.tokenizers["output"]
+    
+      input = tk_input( features.pop(self.input_feature) )
+      target = features.pop(self.target_feature)
+      target_input = tk_target("[START] " + target)
+      target_output = tk_target(target + " [END]")
+    
+      return ({"encoder_inputs": input, "decoder_inputs": target_input}, target_output)
+    
+    def Keras_tranformer_eval_preprocessing(self,features):
+      """
+      Preprocessing function for tf_codage keras_transformer model, evaluation mode
+      """
+      tk_input = self.tokenizers["input"]
+      tk_target =  self.tokenizers["output"]
+    
+      input_lines = features.pop(self.input_feature) 
+      input = tk_input( input_lines )
+      output_lines = features.pop(self.target_feature)
+      labels = tk_target( output_lines )
+    
+      return ({"encoder_inputs": input}, labels, input_lines, output_lines )
 
 

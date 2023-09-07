@@ -9,7 +9,9 @@ import pandas as pd
 import os
 from itertools import chain, islice
 from pathlib import Path
-
+import pickle
+from tensorflow.keras.layers import TextVectorization
+import tensorflow as tf
 
 class TeeStream:
     """Redirect stream to many different outputs.
@@ -210,3 +212,82 @@ def split_file(input_file, out_dir, lines_per_split):
                 f.write(header)
                 f.writelines(lines)
     return split_filenames
+
+def save_tokenizer(tokenizer,PATH):
+    pickle.dump({'config': tokenizer.get_config(),
+             'weights': tokenizer.get_weights()}
+            , open(PATH, "wb"))
+    
+
+def load_tokenizer(PATH):
+    from_disk = pickle.load(open(PATH, "rb"))
+    tok = TextVectorization.from_config(from_disk['config'])
+    # You have to call `adapt` with some dummy data (BUG in Keras)
+    tok.adapt( tf.data.Dataset.from_tensor_slices(["xyz"]))
+    tok.set_weights(from_disk['weights'])
+    return tok
+
+
+
+###Tensor operations
+
+def create_padding_mask(seq):
+    seq = tf.cast(tf.math.equal(seq, 0), tf.float32)
+    return seq
+
+def set_tensor_by_indices_to_value(input_tensor, indices, value):
+    """
+    from : https://github.com/tensorflow/models/blob/master/official/nlp/modeling/ops/sampling_module.py
+    Where indices is True, set the value in input_tensor to value.
+
+    Args:
+    input_tensor: float (batch_size, dim)
+    indices: bool (batch_size, dim)
+    value: float scalar
+
+    Returns:
+    output_tensor: same shape as input_tensor.
+    """
+    value_tensor = tf.zeros_like(input_tensor) + value
+    output_tensor = tf.where(indices, value_tensor, input_tensor)
+    
+    return output_tensor
+
+def pad_tensors_to_same_length(x, y):
+    """Pad x and y so that the results have the same length (second dimension)."""
+    x_length = tf.shape(x)[1]
+    y_length = tf.shape(y)[1]
+
+    max_length = tf.maximum(x_length, y_length)
+
+    x = tf.pad(x, [[0, 0], [0, max_length - x_length]])
+    y = tf.pad(y, [[0, 0], [0, max_length - y_length]])
+    return x, y, max_length.numpy()
+
+def pad_tensor(x, max_length):
+    
+    x_length = tf.shape(x)[0]
+    x = tf.pad(x, [[0, max_length - x_length]])
+
+    return x
+
+def save_metrics_to_file(path_details_file, **kwargs): 
+    print("Saving metrics to file: ", path_details_file)
+    with open(path_details_file, "a", encoding="utf-8") as fic: 
+        for k, v in kwargs.items():
+            if k == "Date":
+                fic.write(f"##########################################################\n")
+            fic.write(f"{k} = {str(v)}\n")
+
+def save_results_to_file(path_details_file, input_lines, output_lines, predictions): 
+   
+    with open(path_details_file, "a", encoding="utf-8") as fic: 
+         fic.write(f"<INPUT> {str(input_lines.decode('utf-8'))} <EXPECTED> {str(output_lines.decode('utf-8'))} <PREDICTED> {predictions}\n")
+            
+def save_config_to_file(path_details_file):
+    print("Saving conifg to file: ", path_details_file)
+    with open(path_details_file, "w", encoding="utf-8") as fic: 
+        for k, v in Config.__dict__.items():
+            if k.isupper(): 
+                fic.write(f"{k} = {str(v)}\n")
+

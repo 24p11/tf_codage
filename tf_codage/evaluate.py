@@ -49,17 +49,23 @@ def _pad_tensors_to_same_length(x, y):
     y = tf.pad(y, [[0, 0], [0, max_length - y_length]])
     return x, y, max_length.numpy()
 
-def seq2seq_true_false_positives(pred, labels):
+def seq2seq_true_false_positives(pred, labels, first_token_id = 3, unk_token_id = 1):
     
     pred, labels, max_length = _pad_tensors_to_same_length(pred, labels)
     padded_pred = tf.cast(pred, tf.int32)
     padded_labels = tf.cast(labels, tf.int32)
+    
+    first_token_id_ = tf.constant([first_token_id])
+    unk_token_id_ =  tf.constant([unk_token_id])
+    
+    #weights_pred = tf.logical_and(tf.not_equal(padded_pred, 0), tf.not_equal(padded_pred, 1))
+    #weights_labels = tf.logical_and(tf.not_equal(padded_labels, 0), tf.not_equal(padded_labels, 1))
 
-    weights_pred = tf.logical_and(tf.not_equal(padded_pred, 0), tf.not_equal(padded_pred, 1))
-    weights_labels = tf.logical_and(tf.not_equal(padded_labels, 0), tf.not_equal(padded_labels, 1))
+    weights_pred =  tf.logical_or( tf.math.greater(padded_pred, first_token_id_) ,tf.equal(padded_pred, unk_token_id_) )
+    weights_labels = tf.logical_or( tf.math.greater(padded_labels, first_token_id) ,tf.equal(padded_labels, unk_token_id_) ) 
 
-    out_in_lab = tf.boolean_mask(isin(padded_pred, padded_labels), weights_pred)
-    lab_in_out = tf.boolean_mask(isin(padded_labels,padded_pred ), weights_labels)
+    out_in_lab = tf.boolean_mask(isin(padded_pred, padded_labels ), weights_pred)
+    lab_in_out = tf.boolean_mask(isin(padded_labels, padded_pred ), weights_labels)
 
     true_positives = tf.cast(out_in_lab, tf.float32)
     false_positives = tf.cast(tf.logical_not(out_in_lab), tf.float32)
